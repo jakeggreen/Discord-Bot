@@ -1,16 +1,20 @@
-# bot.py
+# Discord Python bot
 import os
 
 import discord
-from dotenv import load_dotenv
+from discord.ext import commands
 
-load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+#Pull in bot token from text file
+Token_file = open('token.txt', 'rt')
+token = Token_file.read()
 
-client = discord.Client()
+# client = discord.Client()
+client = commands.Bot(command_prefix = '.')
 
 @client.event
 async def on_ready():
-    print(f'{client.user} has connected to Discord!')
+	 print(f'{client.user} has connected to Discord!')
 
-client.run(TOKEN)
+client.run(token)
+
+
