@@ -105,8 +105,8 @@ async def games(ctx, player):
 
 	for match in session_data:
 		# print('-----\r' + Match.getPlayer(match) + '\r-----')
-		print(Match.getPlayer(match) + ' - Start: ' + str(Match.getStart(match)) + ', End: ' 
-	+ str(Match.getEnd(match)) + ', Played With: ' + str(Match.getLegend(match)) + ', Rank: ' + str(Match.getRank(match)))
+		await ctx.send((Match.getPlayer(match) + ' - Start: ' + str(Match.getStart(match)) + ', End: ' 
+	+ str(Match.getEnd(match)) + ', Played With: ' + str(Match.getLegend(match)) + ', Rank: ' + str(Match.getRank(match))))
 
 client.run(token)
 
