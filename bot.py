@@ -108,6 +108,51 @@ async def games(ctx, player):
 		await ctx.send((Match.getPlayer(match) + ' - Start: ' + str(Match.getStart(match)) + ', End: ' 
 	+ str(Match.getEnd(match)) + ', Played With: ' + str(Match.getLegend(match)) + ', Rank: ' + str(Match.getRank(match))))
 
+@client.command(name="kills")
+async def kills(ctx, player):
+
+	class Legend:
+		def __init__(self, name, kills):
+			self.name = name
+			self.kills = kills
+		def getKills(self):
+			return self.kills
+		def getName(self):
+			return self.name
+
+	def getLegendKills(legend):
+		return legend.getKills()
+
+	APIKey_file = open("Apex.txt", "rt")
+	APIKey = APIKey_file.read()
+
+	all_legend_names_list = ["Bloodhound", "Gibraltar", "Lifeline", "Pathfinder", "Wraith", "Bangalore", "Caustic", "Mirage", 
+	"Octane", "Wattson", "Crypto", "Revenant", "Loba", "Rampart", "Horizon", "Fuse"]
+	all_legend_names_set = set(all_legend_names_list)
+	url = 'https://public-api.tracker.gg/v2/apex/standard/profile/origin/'
+	segment_type = 'legend'
+	payload = {}
+	headers = {'TRN-Api-Key': APIKey}
+	legend_data = list();
+	full_url = url + player + "/segments" + "/" + segment_type
+	response = requests.request("GET", full_url, headers=headers, data=payload)
+	player_data = response.json()
+	for legend in all_legend_names_set:
+		kills = 0;
+		try:
+			for item in player_data["data"]:
+				if item.get("metadata").get("name") == legend:
+					if item.get("stats") and item.get("stats").get("kills") and item.get("stats").get("kills").get("value"):
+						kills = int(item["stats"]["kills"]["value"])
+		except Exception:
+			pass
+		legend_data.append(Legend(legend, kills));
+
+	legend_data.sort(key= getLegendKills, reverse = True)
+
+	for legend in legend_data:
+		ctx.send(str(legend.getKills()) + " kills with " + legend.getName())
+
 client.run(token)
 
 
