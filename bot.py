@@ -9,7 +9,9 @@ from asyncio import sleep
 
 #Set the command prefix character
 PREFIX = '.'
-COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
+
+#Set list comprehension for the cogs available for the bot (includes command script)
+COGS = [path.split("\\")[-1][:-3] for path in glob("./cogs/*.py")]
 
 class Ready(object):
 	def __init__(self):
@@ -36,7 +38,7 @@ class Bot(Bot):
 
 	def setup(self):
 		for cog in COGS:
-			self.load_extension(f'lib.cogs.{cog}')
+			self.load_extension(f'cogs.{cog}')
 			print(f'{cog} cog loaded.')
 
 		print(f'Setup complete.')
@@ -61,8 +63,8 @@ class Bot(Bot):
 	async def on_ready(self):
 		if not self.ready:
 
-			while not self.cogs_ready.all_ready():
-				await sleep(0.5)
+			# while not self.cogs_ready.all_ready():
+			# 	await sleep(0.5)
 
 			self.ready = True
 			print(f'{self.user} is ready')
@@ -79,5 +81,5 @@ class Bot(Bot):
 	# async def on_message(message):
 	# 	message.channel.send(f'Hello {message.author}')
 
-bot = Bot()
+Bot = Bot()
 

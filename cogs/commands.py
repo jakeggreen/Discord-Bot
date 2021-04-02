@@ -1,4 +1,6 @@
 from discord.ext.commands import Cog
+from discord.ext.commands import command
+import discord
 
 #For the API requests
 import requests
@@ -10,7 +12,7 @@ class Commands(Cog):
 		self.bot = bot
 
 	@command(name="map")
-	async def map(ctx):
+	async def map(self, ctx):
 		APIKey_file = open('MozHere API Key.txt', 'rt')
 		APIKey = APIKey_file.read()
 		payload = {}
@@ -27,19 +29,14 @@ class Commands(Cog):
 		await ctx.send(f'Current map is {map_name} for another {map_time_remaining}')
 		await ctx.send(f'Next map is {next_map_name} from {next_map_start}')
 
-	@ccommand(pass_context=True)
-	async def chnick(ctx, member: discord.Member, nick):
-	    await member.edit(nick=nick)
-	    await ctx.send(f'Nickname was changed for {member.mention}.')
-
 	@command(name="members")
-	async def members(ctx):
+	async def members(self, ctx):
 		guild = client.get_guild()
 		memberList = guild.members
 		await ctx.send({memberList})
 
 	@command(name="games")
-	async def games(ctx, player):
+	async def games(self, ctx, player):
 
 		APIKey_file = open('Apex.txt', 'rt')
 		APIKey = APIKey_file.read()
@@ -64,7 +61,7 @@ class Commands(Cog):
 					ctx.send(f'{player} - Start: {startdate}, End: {enddate}. Played with: {legend}, Rank: {rankscore}');
 
 	@command(name="kills")
-	async def kills(ctx, member: discord.Member):
+	async def kills(self, ctx, member: discord.Member):
 
 		APIKey_file = open("Apex.txt", "rt")
 		APIKey = APIKey_file.read()
@@ -74,7 +71,7 @@ class Commands(Cog):
 		all_legend_names_set = set(all_legend_names_list)
 		payload = {}
 		headers = {'TRN-Api-Key': APIKey}
-		legend_data = list();
+		legend_data = list()
 		url = 'https://public-api.tracker.gg/v2/apex/standard/profile/origin/' + player_username + '/segments/legend'
 		response = requests.request("GET", url, headers=headers, data=payload)
 		player_data = response.json()
@@ -87,7 +84,7 @@ class Commands(Cog):
 							kills = int(item["stats"]["kills"]["value"])
 			except Exception:
 				pass
-			await ctx.send(f'{mention.member} - {legend} kills: {kills}');
+			await ctx.send(f'{mention.member} - {legend} kills: {kills}')
 
 	@Cog.listener()
 	async def on_ready(self):
