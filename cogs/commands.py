@@ -83,12 +83,12 @@ class Commands(Cog):
 					await ctx.send(f'{player} - Start: {startdate}, End: {enddate}. Played with: {legend}, Rank: {rankscore}');
 
 	@command(name="kills")
-	async def kills(self, ctx, member: Member):
+	async def kills(self, ctx):
 		"""Searches the Mozambique.re API for legend kills data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
 		APIKey_file = open("Apex.txt", "rt")
 		APIKey = APIKey_file.read()
-		player_username = member.display_name
+		player_username = ctx.author.display_name
 		all_legend_names_list = ["Bloodhound", "Gibraltar", "Lifeline", "Pathfinder", "Wraith", "Bangalore", "Caustic", "Mirage", 
 		"Octane", "Wattson", "Crypto", "Revenant", "Loba", "Rampart", "Horizon", "Fuse"]
 		all_legend_names_set = set(all_legend_names_list)
@@ -107,7 +107,7 @@ class Commands(Cog):
 							kills = int(item["stats"]["kills"]["value"])
 			except Exception:
 				pass
-			await ctx.send(f'{mention.member} - {legend} kills: {kills}')
+			await ctx.send(f'{ctx.author.mention} - {legend} kills: {kills}')
 
 	@Cog.listener()
 	async def on_ready(self):
