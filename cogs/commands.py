@@ -57,7 +57,8 @@ class Commands(Cog):
 
 	@command(name="games")
 	async def games(self, ctx, player):
-
+		"""Searches the Mozambique.re API for recent session data for player - use '.members' to see list of server members. 
+		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
 		APIKey_file = open('Apex.txt', 'rt')
 		APIKey = APIKey_file.read()
 		url = 'https://public-api.tracker.gg/v2/apex/standard/profile/origin/'
@@ -81,7 +82,7 @@ class Commands(Cog):
 					ctx.send(f'{player} - Start: {startdate}, End: {enddate}. Played with: {legend}, Rank: {rankscore}');
 
 	@command(name="kills")
-	async def kills(self, ctx, member: discord.Member):
+	async def kills(self, ctx, member: Member):
 
 		APIKey_file = open("Apex.txt", "rt")
 		APIKey = APIKey_file.read()
