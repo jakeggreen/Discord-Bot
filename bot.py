@@ -56,31 +56,20 @@ async def map(ctx):
 	await ctx.send(f'Current map is {map_name} for another {map_time_remaining}')
 	await ctx.send(f'Next map is {next_map_name} from {next_map_start}')
 
+@client.command(pass_context=True)
+async def chnick(ctx, member: discord.Member, nick):
+    await member.edit(nick=nick)
+    await ctx.send(f'Nickname was changed for {member.mention}.')
+
+@client.command(name="members")
+async def members(ctx):
+	guild = client.get_guild()
+	memberList = guild.members
+	await ctx.send({memberList})
+
 @client.command(name="games")
 async def games(ctx, player):
 
-	class Match:
-		def __init__(self, player, startdate, enddate, legend, rankscore):
-			self.player = player
-			self.startdate = startdate
-			self.enddate = enddate
-			self.legend = legend
-			self.rankscore = rankscore
-		def getPlayer(self):
-			return self.player
-		def getStart(self):
-			return self.startdate
-		def getEnd(self):
-			return self.enddate
-		def getLegend(self):
-			return self.legend
-		def getRank(self):
-			return self.rankscore
-
-		def getPlayerName(player):
-			return Match.getPlayer()
-
-	#pull in API key from text file
 	APIKey_file = open('Apex.txt', 'rt')
 	APIKey = APIKey_file.read()
 	url = 'https://public-api.tracker.gg/v2/apex/standard/profile/origin/'
@@ -101,41 +90,22 @@ async def games(ctx, player):
 			for matches in dates.get('matches'):
 				legend = matches['metadata']['character']['displayValue']
 				rankscore = matches['stats']['rankScore']['value']
-				session_data.append(Match(player, startdate, enddate, legend, rankscore));
-
-	for match in session_data:
-		# print('-----\r' + Match.getPlayer(match) + '\r-----')
-		await ctx.send((Match.getPlayer(match) + ' - Start: ' + str(Match.getStart(match)) + ', End: ' 
-	+ str(Match.getEnd(match)) + ', Played With: ' + str(Match.getLegend(match)) + ', Rank: ' + str(Match.getRank(match))))
+				ctx.send(f'{player} - Start: {startdate}, End: {enddate}. Played with: {legend}, Rank: {rankscore}');
 
 @client.command(name="kills")
-async def kills(ctx, player):
-
-	class Legend:
-		def __init__(self, name, kills):
-			self.name = name
-			self.kills = kills
-		def getKills(self):
-			return self.kills
-		def getName(self):
-			return self.name
-
-	def getLegendKills(legend):
-		return legend.getKills()
+async def kills(ctx, member: discord.Member):
 
 	APIKey_file = open("Apex.txt", "rt")
 	APIKey = APIKey_file.read()
-
+	player_username = member.display_name
 	all_legend_names_list = ["Bloodhound", "Gibraltar", "Lifeline", "Pathfinder", "Wraith", "Bangalore", "Caustic", "Mirage", 
 	"Octane", "Wattson", "Crypto", "Revenant", "Loba", "Rampart", "Horizon", "Fuse"]
 	all_legend_names_set = set(all_legend_names_list)
-	url = 'https://public-api.tracker.gg/v2/apex/standard/profile/origin/'
-	segment_type = 'legend'
 	payload = {}
 	headers = {'TRN-Api-Key': APIKey}
 	legend_data = list();
-	full_url = url + player + "/segments" + "/" + segment_type
-	response = requests.request("GET", full_url, headers=headers, data=payload)
+	url = 'https://public-api.tracker.gg/v2/apex/standard/profile/origin/' + player_username + '/segments/legend'
+	response = requests.request("GET", url, headers=headers, data=payload)
 	player_data = response.json()
 	for legend in all_legend_names_set:
 		kills = 0;
@@ -146,12 +116,7 @@ async def kills(ctx, player):
 						kills = int(item["stats"]["kills"]["value"])
 		except Exception:
 			pass
-		legend_data.append(Legend(legend, kills));
-
-	legend_data.sort(key= getLegendKills, reverse = True)
-
-	for legend in legend_data:
-		ctx.send(str(legend.getKills()) + " kills with " + legend.getName())
+		await ctx.send(f'{mention.member} - {legend} kills: {kills}');
 
 client.run(token)
 
