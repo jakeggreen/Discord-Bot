@@ -8,12 +8,22 @@ class Welcome(Cog):
 		self.bot = bot
 
 	@Cog.listener()
+	async def on_ready(self):
+		if not self.bot.ready:
+			self.bot.cogs_ready.ready_up("welcome")
+
+	@Cog.listener()
 	async def on_member_join(self, member):
-		await bot.send_message(discord.utils.get(server.channels, name = "channel_name"), (f'{member} has joined {member.guild.name}.'))
+		channel = member.guild.system_channel
+		await channel.send(f'{member} has joined {member.guild.name}.')
 
+	@Cog.listener()
 	async def on_member_remove(self, member):
-		await bot.send_message(discord.utils.get(server.channels, name = "channel_name"), (f'{member} has left {member.guild.name}.'))
+		channel = member.guild.system_channel
+		# await bot.send_message(discord.utils.get(server.channels, name = "channel_name"), (f'{member} has left {member.guild.name}.'))
+		await channel.send(f'{member} has left {member.guild.name}.')
 
+	@Cog.listener()
 	async def on_message(self, message):
 		# message.channel.send(f'Hello {message.author}')
 		pass
