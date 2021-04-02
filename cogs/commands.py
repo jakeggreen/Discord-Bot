@@ -31,9 +31,16 @@ class Commands(Cog):
 
 	@command(name="members")
 	async def members(self, ctx):
-		guild = client.get_guild()
-		memberList = guild.members
-		await ctx.send({memberList})
+		memberList = []
+		for member in ctx.guild.members:
+			if member == self.bot:
+				pass
+			else: 
+				# memberList += member.name
+				memberList.append(member.name)
+		
+		for name in memberList:
+			await ctx.send({name})
 
 	@command(name="games")
 	async def games(self, ctx, player):

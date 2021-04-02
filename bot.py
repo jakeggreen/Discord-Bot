@@ -72,14 +72,5 @@ class Bot(Bot):
 		else:
 			print(f'{self.user} reconnected')
 
-	# async def on_member_join(member):
-	# 	print(f'{member} has joined {member.guild.name}.')
-
-	# async def on_member_remove(member):
-	# 	print(f'{member} has left {member.guild.name}.')
-
-	# async def on_message(message):
-	# 	message.channel.send(f'Hello {message.author}')
-
 Bot = Bot()
 
