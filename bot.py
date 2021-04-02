@@ -6,6 +6,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot
 from glob import glob
 from asyncio import sleep
+from discord.ext.commands import CommandNotFound
 
 #Set the command prefix character
 PREFIX = '.'
@@ -18,7 +19,7 @@ class Ready(object):
 		for cog in COGS:
 			setattr(self, cog, False)
 
-	def ready_up(self, cogs):
+	def ready_up(self, cog):
 		setattr(self, cog, True)
 		print(f'{cog} cog ready.')
 
@@ -60,11 +61,24 @@ class Bot(Bot):
 	async def on_disconnect(self):
 		print(f'{self.user} has disconnected from Discord')
 
+	async def on_error(self, err, *args, **kwargs):
+		if err == "on command error":
+			await args[0].send(f'Something went wrong.')
+
+		raise 
+
+	async def on_command_error(self, ctx, exc):
+		if isinstance(exc, CommandNotFound):
+			pass
+
+		# elif hasattr(exc, "original"):
+		# 	raise exc.original
+
+		# else:
+		# 	raise exc
+
 	async def on_ready(self):
 		if not self.ready:
-
-			# while not self.cogs_ready.all_ready():
-			# 	await sleep(0.5)
 
 			self.ready = True
 			print(f'{self.user} is ready')

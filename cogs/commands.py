@@ -1,6 +1,8 @@
 from discord.ext.commands import Cog
 from discord.ext.commands import command
+from discord import Member
 import discord
+
 
 #For the API requests
 import requests
@@ -8,7 +10,7 @@ import json
 import datetime
 
 class Commands(Cog):
-	def __init__(self,bot):
+	def __init__(self, bot):
 		self.bot = bot
 
 	@command(name="map")
@@ -33,14 +35,11 @@ class Commands(Cog):
 	async def members(self, ctx):
 		memberList = []
 		for member in ctx.guild.members:
-			if member == self.bot:
-				pass
-			else: 
-				# memberList += member.name
+			if not member == 'Apex Stats':
 				memberList.append(member.display_name)
-		
-		for name in memberList:
-			await ctx.send({name})
+			else:
+				pass
+		await ctx.send([f'{name}' for name in memberList])
 
 	@command(name="games")
 	async def games(self, ctx, player):
@@ -92,6 +91,11 @@ class Commands(Cog):
 			except Exception:
 				pass
 			await ctx.send(f'{mention.member} - {legend} kills: {kills}')
+
+	# @command(name="swear")
+	# async def swear_member(self, ctx, member: Member)
+	# 	await ctx.send(f'{ctx.author.name} says {choice(('fuck you','go fuck yourself'))} {member.mention}')
+
 
 	@Cog.listener()
 	async def on_ready(self):
