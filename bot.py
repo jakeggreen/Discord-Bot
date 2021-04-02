@@ -5,7 +5,6 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
 from glob import glob
-from asyncio import sleep
 from discord.ext.commands import CommandNotFound
 
 #Set the command prefix character

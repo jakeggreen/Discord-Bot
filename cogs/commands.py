@@ -39,7 +39,7 @@ class Commands(Cog):
 		# await ctx.send(embed=embed_map)
 		# await ctx.send("Map")
 
-		await ctx.send(f'\nCurrent Map is "{map_name}" for another: {map_time_remaining} \nNext Map is "{next_map_name}" from {next_map_start}')
+		await ctx.send(f"Current Map is '{map_name}' for another: {map_time_remaining}. Next Map is '{next_map_name}' from {next_map_start}")
 
 	@command(name="members")
 	async def members(self, ctx):
