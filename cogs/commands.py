@@ -49,11 +49,12 @@ class Commands(Cog):
 				memberList.append(member.display_name)
 			else:
 				pass
-		embed = Embed(title=f'Server Members List',
-					description=f'Shows the current members of the server',
-					colour=ctx.author.colour)
-		embed.add_field(name=f'Member List', value=[f'{name}' for name in memberList])
-		await ctx.send(embed=embed)
+		# embed = Embed(title=f'Server Members List',
+		# 			description=f'Shows the current members of the server',
+		# 			colour=ctx.author.colour)
+		# embed.add_field(name=f'Member List', value=[f'{name}' for name in memberList])
+		# await ctx.send(embed=embed)
+		await ctx.send([f'{name}' for name in memberList])
 
 	@command(name="games")
 	async def games(self, ctx, player):
@@ -79,11 +80,12 @@ class Commands(Cog):
 				for matches in dates.get('matches'):
 					legend = matches['metadata']['character']['displayValue']
 					rankscore = matches['stats']['rankScore']['value']
-					ctx.send(f'{player} - Start: {startdate}, End: {enddate}. Played with: {legend}, Rank: {rankscore}');
+					await ctx.send(f'{player} - Start: {startdate}, End: {enddate}. Played with: {legend}, Rank: {rankscore}');
 
 	@command(name="kills")
 	async def kills(self, ctx, member: Member):
-
+		"""Searches the Mozambique.re API for legend kills data for player - use '.members' to see list of server members. 
+		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
 		APIKey_file = open("Apex.txt", "rt")
 		APIKey = APIKey_file.read()
 		player_username = member.display_name
@@ -106,11 +108,6 @@ class Commands(Cog):
 			except Exception:
 				pass
 			await ctx.send(f'{mention.member} - {legend} kills: {kills}')
-
-	# @command(name="swear")
-	# async def swear_member(self, ctx, member: Member)
-	# 	await ctx.send(f'{ctx.author.name} says {choice(('fuck you','go fuck yourself'))} {member.mention}')
-
 
 	@Cog.listener()
 	async def on_ready(self):
