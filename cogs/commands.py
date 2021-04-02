@@ -37,7 +37,7 @@ class Commands(Cog):
 				pass
 			else: 
 				# memberList += member.name
-				memberList.append(member.name)
+				memberList.append(member.display_name)
 		
 		for name in memberList:
 			await ctx.send({name})
