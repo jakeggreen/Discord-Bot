@@ -15,6 +15,8 @@ class Commands(Cog):
 
 	@command(name="map")
 	async def map(self, ctx):
+		"""Shows information about the current and upcoming map rotations for Apex Legends, based on data from the Mozambique.re API.
+		N.B. Might not always be accurate."""
 		APIKey_file = open('MozHere API Key.txt', 'rt')
 		APIKey = APIKey_file.read()
 		payload = {}
@@ -28,8 +30,16 @@ class Commands(Cog):
 		map_time_remaining = str(map_rotation_data.get('current').get('remainingTimer'))
 		next_map_name = map_rotation_data.get('next').get('map')
 		next_map_start = str(map_rotation_data.get('next').get('readableDate_start'))
-		await ctx.send(f'Current map is {map_name} for another {map_time_remaining}')
-		await ctx.send(f'Next map is {next_map_name} from {next_map_start}')
+		
+		# embed_map = Embed(title=f'Apex Legends Map Rotation',
+		# 			description=f'Shows the current and upcoming map')
+		# embed_map.add_field(name=f'Current Map', value=f'{map_name} for {map_time_remaining}')
+		# embed_map.add_field(name=f'Next Map', value=f'{next_map_name} starts in {next_map_start}')
+
+		# await ctx.send(embed=embed_map)
+		# await ctx.send("Map")
+
+		await ctx.send(f'\nCurrent Map is "{map_name}" for another: {map_time_remaining} \nNext Map is "{next_map_name}" from {next_map_start}')
 
 	@command(name="members")
 	async def members(self, ctx):
@@ -39,7 +49,11 @@ class Commands(Cog):
 				memberList.append(member.display_name)
 			else:
 				pass
-		await ctx.send([f'{name}' for name in memberList])
+		embed = Embed(title=f'Server Members List',
+					description=f'Shows the current members of the server',
+					colour=ctx.author.colour)
+		embed.add_field(name=f'Member List', value=[f'{name}' for name in memberList])
+		await ctx.send(embed=embed)
 
 	@command(name="games")
 	async def games(self, ctx, player):
