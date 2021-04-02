@@ -81,19 +81,39 @@ class Commands(Cog):
 					ctx.send(f'{player} - Start: {startdate}, End: {enddate}. Played with: {legend}, Rank: {rankscore}');
 
 	@command(name="kills")
-	async def kills(self, ctx, member: discord.Member):
+	async def kills(self, ctx):
+
+		print("in kills script")
 
 		APIKey_file = open("Apex.txt", "rt")
 		APIKey = APIKey_file.read()
-		player_username = member.display_name
+		player_username = ctx.author.display_name
 		all_legend_names_list = ["Bloodhound", "Gibraltar", "Lifeline", "Pathfinder", "Wraith", "Bangalore", "Caustic", "Mirage", 
 		"Octane", "Wattson", "Crypto", "Revenant", "Loba", "Rampart", "Horizon", "Fuse"]
 		all_legend_names_set = set(all_legend_names_list)
 		payload = {}
+
 		headers = {'TRN-Api-Key': APIKey}
 		legend_data = list()
+		
 		url = 'https://public-api.tracker.gg/v2/apex/standard/profile/origin/' + player_username + '/segments/legend'
-		response = requests.request("GET", url, headers=headers, data=payload)
+
+		response = None
+		try:
+			response = requests.request("GET", url, headers=headers, data=payload)
+		except Exception as e:
+			print(e)
+		# except requests.ConnectionError as e:
+		#     print("OOPS!! Connection Error. Make sure you are connected to Internet. Technical Details given below.\n")
+		#     print(str(e))            
+		# except requests.Timeout as e:
+		#     print("OOPS!! Timeout Error")
+		#     print(str(e))
+		# except requests.RequestException as e:
+		#     print("OOPS!! General Error")
+		#     print(str(e))
+
+		print("status code " + str(response.status_code))
 		player_data = response.json()
 		for legend in all_legend_names_set:
 			kills = 0;
@@ -104,7 +124,7 @@ class Commands(Cog):
 							kills = int(item["stats"]["kills"]["value"])
 			except Exception:
 				pass
-			await ctx.send(f'{mention.member} - {legend} kills: {kills}')
+			await ctx.send(f'{ctx.author.mention} - {legend} kills: {kills}')
 
 	# @command(name="swear")
 	# async def swear_member(self, ctx, member: Member)

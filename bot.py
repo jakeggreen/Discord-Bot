@@ -64,8 +64,7 @@ class Bot(Bot):
 	async def on_error(self, err, *args, **kwargs):
 		if err == "on command error":
 			await args[0].send(f'Something went wrong.')
-
-		raise 
+		raise
 
 	async def on_command_error(self, ctx, exc):
 		if isinstance(exc, CommandNotFound):
@@ -79,7 +78,6 @@ class Bot(Bot):
 
 	async def on_ready(self):
 		if not self.ready:
-
 			self.ready = True
 			print(f'{self.user} is ready')
 
