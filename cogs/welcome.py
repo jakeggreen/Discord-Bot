@@ -1,5 +1,6 @@
 from discord.ext.commands import Cog
 from discord.ext.commands import command
+from discord.utils import get
 import discord
 
 class Welcome(Cog):
