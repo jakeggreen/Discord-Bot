@@ -66,14 +66,16 @@ class Commands(Cog):
 			#get the start and end dates for matches
 			msg = ""
 			for dates in player_data.get('data').get('items'):
-				startdate = datetime.datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
-				enddate = datetime.datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
+				start_dt = datetime.datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
+				end_dt = datetime.datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
+
+				begin = start_dt.strftime('%Y-%m-%d %H:%M')
+				duration = str(end_dt - start_dt)
 				#for each match get the legend used and the ending rank score
 				for matches in dates.get('matches'):
 					legend = matches['metadata']['character']['displayValue']
 					rankscore = matches['stats']['rankScore']['value']
-					msg += f'\nStart: {startdate}, End: {enddate}. Played with: {legend}, RP: {rankscore}'
-			print(msg)
+					msg += f'\n{begin}, Duration: {duration} . Played with: {legend}, RP: {rankscore}'
 			await ctx.send(f'{msg}')
 		else:
 			await ctx.send(f'No session date found for username {player}')
