@@ -1,46 +1,42 @@
 from discord.ext.commands import Cog
 from discord.ext.commands import command
 from discord import Member
+from discord import Embed
 import discord
-
-
-#For the API requests
-import requests
 import json
 import datetime
+from lib.api import Api, Mozam, GG_Tracker
+
+
+all_legend_names_list = ["Bloodhound", "Gibraltar", "Lifeline", "Pathfinder", "Wraith", "Bangalore", "Caustic", "Mirage", 
+		"Octane", "Wattson", "Crypto", "Revenant", "Loba", "Rampart", "Horizon", "Fuse"]
+
 
 class Commands(Cog):
 	def __init__(self, bot):
 		self.bot = bot
+		self.mozam_api = Mozam()
+		self.gg_tracker_api = GG_Tracker()
+		self.msg_delete_time = 60
 
 	@command(name="map")
 	async def map(self, ctx):
 		"""Shows information about the current and upcoming map rotations for Apex Legends, based on data from the Mozambique.re API.
 		N.B. Might not always be accurate."""
-		APIKey_file = open('MozHere API Key.txt', 'rt')
-		APIKey = APIKey_file.read()
-		payload = {}
-		headers = {}
-		url = 'https://api.mozambiquehe.re/maprotation?auth=' + APIKey
-		response = requests.request('GET', url, headers=headers, data=payload)
-		map_rotation_data = response.json()
+		map_rotation_data = self.mozam_api.getMaps()
 		map_name = map_rotation_data.get('current').get('map')
 		start = map_rotation_data.get('current').get('readableDate_start')
 		end = map_rotation_data.get('current').get('readableDate_end')
 		map_time_remaining = str(map_rotation_data.get('current').get('remainingTimer'))
 		next_map_name = map_rotation_data.get('next').get('map')
 		next_map_start = str(map_rotation_data.get('next').get('readableDate_start'))
-		
-		# embed_map = Embed(title=f'Apex Legends Map Rotation',
-		# 			description=f'Shows the current and upcoming map')
-		# embed_map.add_field(name=f'Current Map', value=f'{map_name} for {map_time_remaining}')
-		# embed_map.add_field(name=f'Next Map', value=f'{next_map_name} starts in {next_map_start}')
 
-		# await ctx.send(embed=embed_map)
-		# await ctx.send("Map")
-
-		await ctx.send(f"Current Map is '{map_name}' for another: {map_time_remaining}. Next Map is '{next_map_name}' from {next_map_start}")
-
+		embed = Embed(title=f'Apex Legends Map Rotation', description=f'Shows the current and upcoming maps on Apex Legends')
+		embed.add_field(name=f'Current Map', value=f'{map_name} for {map_time_remaining}')
+		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts in {next_map_start}')
+		#print('Length of the embed is ' + str(len(embed)))
+	
+		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 	@command(name="members")
 	async def members(self, ctx):
 		memberList = []
@@ -58,21 +54,17 @@ class Commands(Cog):
 
 	@command(name="games")
 	async def games(self, ctx, player):
-		"""Searches the Mozambique.re API for recent session data for player - use '.members' to see list of server members. 
+		"""Searches the tracker.gg API for recent session data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
-		APIKey_file = open('Apex.txt', 'rt')
-		APIKey = APIKey_file.read()
-		url = 'https://public-api.tracker.gg/v2/apex/standard/profile/origin/'
-		payload = {}
-		headers = {'TRN-Api-Key': APIKey}
-		session_data = list();
 
-		full_url = url + player + '/sessions'
-		response = requests.request('GET', full_url, headers=headers, data=payload)
-		player_data = response.json()
+		if not player:
+			await ctx.send(f'No player name provided');
+		
+		player_data = self.gg_tracker_api.getGames(player)
 		#check to see if player data is available
 		if player_data.get('data') and player_data.get('data').get('items'):
 			#get the start and end dates for matches
+			msg = ""
 			for dates in player_data.get('data').get('items'):
 				startdate = datetime.datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
 				enddate = datetime.datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
@@ -80,54 +72,34 @@ class Commands(Cog):
 				for matches in dates.get('matches'):
 					legend = matches['metadata']['character']['displayValue']
 					rankscore = matches['stats']['rankScore']['value']
-					await ctx.send(f'{player} - Start: {startdate}, End: {enddate}. Played with: {legend}, Rank: {rankscore}');
+					msg += f'\nStart: {startdate}, End: {enddate}. Played with: {legend}, RP: {rankscore}'
+			print(msg)
+			await ctx.send(f'{msg}')
+		else:
+			await ctx.send(f'No session date found for username {player}')
 
 	@command(name="kills")
 	async def kills(self, ctx):
 		"""Searches the Mozambique.re API for legend kills data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
-		print("in kills script")
+		username = ctx.author.display_name
+		player_data = self.gg_tracker_api.getKills(username)
 
-		APIKey_file = open("Apex.txt", "rt")
-		APIKey = APIKey_file.read()
-		player_username = ctx.author.display_name
-		all_legend_names_list = ["Bloodhound", "Gibraltar", "Lifeline", "Pathfinder", "Wraith", "Bangalore", "Caustic", "Mirage", 
-		"Octane", "Wattson", "Crypto", "Revenant", "Loba", "Rampart", "Horizon", "Fuse"]
-		all_legend_names_set = set(all_legend_names_list)
-		payload = {}
-
-		headers = {'TRN-Api-Key': APIKey}
-		legend_data = list()
-		
-		url = 'https://public-api.tracker.gg/v2/apex/standard/profile/origin/' + player_username + '/segments/legend'
-
-		response = None
-		try:
-			response = requests.request("GET", url, headers=headers, data=payload)
-		except Exception as e:
-			print(e)
-		# except requests.ConnectionError as e:
-		#     print("OOPS!! Connection Error. Make sure you are connected to Internet. Technical Details given below.\n")
-		#     print(str(e))            
-		# except requests.Timeout as e:
-		#     print("OOPS!! Timeout Error")
-		#     print(str(e))
-		# except requests.RequestException as e:
-		#     print("OOPS!! General Error")
-		#     print(str(e))
-
-		print("status code " + str(response.status_code))
-		player_data = response.json()
-		for legend in all_legend_names_set:
-			kills = 0;
-			try:
-				for item in player_data["data"]:
-					if item.get("metadata").get("name") == legend:
-						if item.get("stats") and item.get("stats").get("kills") and item.get("stats").get("kills").get("value"):
-							kills = int(item["stats"]["kills"]["value"])
-			except Exception:
-				pass
-			await ctx.send(f'{ctx.author.mention} - {legend} kills: {kills}')
+		if player_data is not None:
+			msg = ""
+			for legend in all_legend_names_list:
+				kills = 0;
+				try:
+					for item in player_data["data"]:
+						if item.get("metadata").get("name") == legend:
+							if item.get("stats") and item.get("stats").get("kills") and item.get("stats").get("kills").get("value"):
+								kills = int(item["stats"]["kills"]["value"])
+				except Exception:
+					pass
+				msg += f'{legend} kills: {kills}\n '
+			await ctx.send(f'{ctx.author.mention} \n{msg}')
+		else:
+			await ctx.send(f'Username {username} not found')
 
 	@Cog.listener()
 	async def on_ready(self):
