@@ -1,6 +1,7 @@
 from discord.ext.commands import Cog
 from discord.ext.commands import command
 from discord import Member
+from discord import Embed
 import discord
 
 
@@ -8,6 +9,9 @@ import discord
 import requests
 import json
 import datetime
+
+#Sets the message delete time i.e. command messages will delete after 60 seconds.
+DELETE_TIME = 60
 
 class Commands(Cog):
 	def __init__(self, bot):
@@ -30,31 +34,30 @@ class Commands(Cog):
 		map_time_remaining = str(map_rotation_data.get('current').get('remainingTimer'))
 		next_map_name = map_rotation_data.get('next').get('map')
 		next_map_start = str(map_rotation_data.get('next').get('readableDate_start'))
-		
-		# embed_map = Embed(title=f'Apex Legends Map Rotation',
-		# 			description=f'Shows the current and upcoming map')
-		# embed_map.add_field(name=f'Current Map', value=f'{map_name} for {map_time_remaining}')
-		# embed_map.add_field(name=f'Next Map', value=f'{next_map_name} starts in {next_map_start}')
 
-		# await ctx.send(embed=embed_map)
-		# await ctx.send("Map")
+		embed = Embed(title=f'Apex Legends Map Rotation', description=f'Shows the current and upcoming maps on Apex Legends')
+		embed.add_field(name=f'Current Map', value=f'{map_name} for {map_time_remaining}')
+		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts in {next_map_start}')
+		print('Length of the embed is ' + str(len(embed)))
 
-		await ctx.send(f"Current Map is '{map_name}' for another: {map_time_remaining}. Next Map is '{next_map_name}' from {next_map_start}")
+		await ctx.send(embed=embed, delete_after=DELETE_TIME)
 
 	@command(name="members")
 	async def members(self, ctx):
-		memberList = []
-		for member in ctx.guild.members:
-			if not member == 'Apex Stats':
-				memberList.append(member.display_name)
-			else:
-				pass
-		# embed = Embed(title=f'Server Members List',
-		# 			description=f'Shows the current members of the server',
-		# 			colour=ctx.author.colour)
-		# embed.add_field(name=f'Member List', value=[f'{name}' for name in memberList])
-		# await ctx.send(embed=embed)
-		await ctx.send([f'{name}' for name in memberList])
+		members = ctx.guild.members.display_name
+		print(members)
+		# memberList = []
+		# for member in ctx.guild.members:
+		# 	if not member == 'Apex Stats':
+		# 		memberList.append(member.display_name)
+		# 	else:
+		# 		pass
+		embed = Embed(title=f'Server Members List',
+					description=f'Shows the current members of the server',
+					colour=ctx.author.colour)
+		embed.add_field(name=f'Member List', value=f'{members}', inline=True)
+		await ctx.send(embed=embed, delete_after=DELETE_TIME)
+		# await ctx.send([f'{name}' for name in memberList], delete_after=DELETE_TIME)
 
 	@command(name="games")
 	async def games(self, ctx, player):
@@ -80,14 +83,13 @@ class Commands(Cog):
 				for matches in dates.get('matches'):
 					legend = matches['metadata']['character']['displayValue']
 					rankscore = matches['stats']['rankScore']['value']
-					await ctx.send(f'{player} - Start: {startdate}, End: {enddate}. Played with: {legend}, Rank: {rankscore}');
+					await ctx.send(f'{player} - Start: {startdate}, End: {enddate}. Played with: {legend}, Rank: {rankscore}', delete_after=DELETE_TIME);
 
 	@command(name="kills")
 	async def kills(self, ctx):
 		"""Searches the Mozambique.re API for legend kills data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
 		print("in kills script")
-
 		APIKey_file = open("Apex.txt", "rt")
 		APIKey = APIKey_file.read()
 		player_username = ctx.author.display_name
@@ -95,27 +97,14 @@ class Commands(Cog):
 		"Octane", "Wattson", "Crypto", "Revenant", "Loba", "Rampart", "Horizon", "Fuse"]
 		all_legend_names_set = set(all_legend_names_list)
 		payload = {}
-
 		headers = {'TRN-Api-Key': APIKey}
 		legend_data = list()
-		
 		url = 'https://public-api.tracker.gg/v2/apex/standard/profile/origin/' + player_username + '/segments/legend'
-
 		response = None
 		try:
 			response = requests.request("GET", url, headers=headers, data=payload)
 		except Exception as e:
 			print(e)
-		# except requests.ConnectionError as e:
-		#     print("OOPS!! Connection Error. Make sure you are connected to Internet. Technical Details given below.\n")
-		#     print(str(e))            
-		# except requests.Timeout as e:
-		#     print("OOPS!! Timeout Error")
-		#     print(str(e))
-		# except requests.RequestException as e:
-		#     print("OOPS!! General Error")
-		#     print(str(e))
-
 		print("status code " + str(response.status_code))
 		player_data = response.json()
 		for legend in all_legend_names_set:
@@ -127,7 +116,7 @@ class Commands(Cog):
 							kills = int(item["stats"]["kills"]["value"])
 			except Exception:
 				pass
-			await ctx.send(f'{ctx.author.mention} - {legend} kills: {kills}')
+			await ctx.send(f'{ctx.author.mention} - {legend} kills: {kills}', delete_after=DELETE_TIME)
 
 	@Cog.listener()
 	async def on_ready(self):

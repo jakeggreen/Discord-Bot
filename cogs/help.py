@@ -30,7 +30,7 @@ class Help(Cog):
 					description= syntax(command),
 					colour=ctx.author.colour)
 		embed.add_field(name='Command description', value=command.help)
-		await ctx.send(embed=embed)
+		await ctx.send(embed=embed, delete_after=60)
 
 	@command(name='help')
 	async def show_help(self, ctx, cmd: Optional[str]):
