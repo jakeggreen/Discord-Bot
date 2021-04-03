@@ -1,6 +1,6 @@
 token.txt
 MozHere API Key.txt
 Apex.txt
-*.pyc
+**.pyc
 __pycache__
-*.orig
+**.orig
