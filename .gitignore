@@ -3,3 +3,4 @@ MozHere API Key.txt
 Apex.txt
 *.pyc
 __pycache__
+*.orig
