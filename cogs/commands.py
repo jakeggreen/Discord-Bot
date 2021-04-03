@@ -6,6 +6,7 @@ import discord
 import json
 import datetime
 from lib.api import Api, Mozam, GG_Tracker
+from typing import Optional
 
 
 all_legend_names_list = ["Bloodhound", "Gibraltar", "Lifeline", "Pathfinder", "Wraith", "Bangalore", "Caustic", "Mirage", 
@@ -79,7 +80,7 @@ class Commands(Cog):
 					msg += f'\n{begin}, Duration: {duration} . Played with: {legend}, RP: {rankscore}'
 			await ctx.send(f'{msg}')
 		else:
-			await ctx.send(f'No session date found for username {player}')
+			await ctx.send(f'No session data found for username {player}')
 
 	@command(name="kills")
 	async def kills(self, ctx):

@@ -27,7 +27,7 @@ class Mozam(Api):
 		default_params = [('auth', self.APIKey)]
 		default_headers = {}
 
-		super().__init__(name, base_url,default_headers, default_params, 'URL Params')
+		super().__init__(name, base_url, default_headers, default_params, 'URL Params')
 
 	def getMaps(self):
 		response = self.makeHTTPRequest('GET','/maprotation')
