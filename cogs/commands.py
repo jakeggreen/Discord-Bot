@@ -37,6 +37,7 @@ class Commands(Cog):
 		#print('Length of the embed is ' + str(len(embed)))
 	
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
+		
 	@command(name="members")
 	async def members(self, ctx):
 		memberList = []
