@@ -26,33 +26,34 @@ class Commands(Cog):
 		N.B. Might not always be accurate."""
 		map_rotation_data = self.mozam_api.getMaps()
 		map_name = map_rotation_data.get('current').get('map')
-		start = map_rotation_data.get('current').get('readableDate_start')
-		end = map_rotation_data.get('current').get('readableDate_end')
 		map_time_remaining = str(map_rotation_data.get('current').get('remainingTimer'))
 		next_map_name = map_rotation_data.get('next').get('map')
 		next_map_start = str(map_rotation_data.get('next').get('readableDate_start'))
 
 		embed = Embed(title=f'Apex Legends Map Rotation', description=f'Shows the current and upcoming maps on Apex Legends')
 		embed.add_field(name=f'Current Map', value=f'{map_name} for {map_time_remaining}')
-		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts in {next_map_start}')
-		#print('Length of the embed is ' + str(len(embed)))
-	
+		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {next_map_start}')
+		#test to see if the bot will delete the command message as well as command response
+		#otherwise chat will fill up with seemingly unanswered command messages!
+		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
+
 		
 	@command(name="members")
 	async def members(self, ctx):
 		memberList = []
 		for member in ctx.guild.members:
-			if not member == 'Apex Stats':
+			if not member.name == 'Apex Stats':
+				print(member)
 				memberList.append(member.display_name)
 			else:
 				pass
-		# embed = Embed(title=f'Server Members List',
-		# 			description=f'Shows the current members of the server',
-		# 			colour=ctx.author.colour)
-		# embed.add_field(name=f'Member List', value=[f'{name}' for name in memberList])
-		# await ctx.send(embed=embed)
-		await ctx.send([f'{name}' for name in memberList])
+		embed = Embed(title=f'Server Members List',
+					description=f'Shows the current members of the server',
+					colour=ctx.author.colour)
+		embed.add_field(name=f'Member List', value=[f'{name}' for name in memberList])
+		await ctx.message.delete()
+		await ctx.send(embed=embed)
 
 	@command(name="games")
 	async def games(self, ctx, player):
@@ -78,17 +79,21 @@ class Commands(Cog):
 					legend = matches['metadata']['character']['displayValue']
 					rankscore = matches['stats']['rankScore']['value']
 					msg += f'\n{begin}, Duration: {duration} . Played with: {legend}, RP: {rankscore}'
+			await ctx.message.delete() 
 			await ctx.send(f'{msg}')
 		else:
 			await ctx.send(f'No session data found for username {player}')
 
 	@command(name="kills")
-	async def kills(self, ctx):
+	async def kills(self, ctx, player: Optional[str]):
 		"""Searches the Mozambique.re API for legend kills data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
-		username = ctx.author.display_name
+		if not player: 
+			username = ctx.author.display_name
+		else:
+			username = player
 		player_data = self.gg_tracker_api.getKills(username)
-
+		print(player_data)
 		if player_data is not None:
 			msg = ""
 			for legend in all_legend_names_list:
@@ -101,9 +106,13 @@ class Commands(Cog):
 				except Exception:
 					pass
 				msg += f'{legend} kills: {kills}\n '
-			await ctx.send(f'{ctx.author.mention} \n{msg}')
+				embed = Embed(title=f'Kills', description=f'Kills with Apex Legend legends', colour=ctx.author.mention)
+				embed.add_field(name=f'{ctx.author.mention}', value=f'\n{msg}', inline=True)
+				#(f'{ctx.author.mention} \n{msg}')
+			await ctx.message.delete()
+			await ctx.send(embed=embed)
 		else:
-			await ctx.send(f'Username {username} not found')
+			await ctx.send(f'Username "{username}" not found')
 
 	@Cog.listener()
 	async def on_ready(self):
