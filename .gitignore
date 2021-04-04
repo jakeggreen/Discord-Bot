@@ -1,6 +1,5 @@
-token.txt
-MozHere API Key.txt
-Apex.txt
+**.txt
 **.pyc
 **__pycache__
 **.orig
+cogs\__pycache__
