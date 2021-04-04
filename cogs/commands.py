@@ -53,7 +53,7 @@ class Commands(Cog):
 					colour=ctx.author.colour)
 		embed.add_field(name=f'Member List', value=[f'{name}' for name in memberList])
 		await ctx.message.delete()
-		await ctx.send(embed=embed)
+		await ctx.send(embed=embed ,delete_after= self.msg_delete_time)
 
 	@command(name="games")
 	async def games(self, ctx, player):
@@ -92,8 +92,8 @@ class Commands(Cog):
 			username = ctx.author.display_name
 		else:
 			username = player
+		await ctx.message.delete()
 		player_data = self.gg_tracker_api.getKills(username)
-		print(player_data)
 		if player_data is not None:
 			msg = ""
 			for legend in all_legend_names_list:
@@ -106,13 +106,13 @@ class Commands(Cog):
 				except Exception:
 					pass
 				msg += f'{legend} kills: {kills}\n '
-				embed = Embed(title=f'Kills', description=f'Kills with Apex Legend legends', colour=ctx.author.mention)
-				embed.add_field(name=f'{ctx.author.mention}', value=f'\n{msg}', inline=True)
+			print(msg)
+			embed = Embed(title=username, description=msg)
+			# embed.add_field(name=username, value=msg, inline=True)
 				#(f'{ctx.author.mention} \n{msg}')
-			await ctx.message.delete()
-			await ctx.send(embed=embed)
+			await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 		else:
-			await ctx.send(f'Username "{username}" not found')
+			await ctx.send(f'Username "{username}" not found', delete_after= self.msg_delete_time)
 
 	@Cog.listener()
 	async def on_ready(self):
