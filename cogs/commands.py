@@ -79,10 +79,11 @@ class Commands(Cog):
 					legend = matches['metadata']['character']['displayValue']
 					rankscore = matches['stats']['rankScore']['value']
 					msg += f'\n{begin}, Duration: {duration} . Played with: {legend}, RP: {rankscore}'
-			await ctx.message.delete() 
-			await ctx.send(f'{msg}')
+			embed = Embed(title=player, description=msg)
+			await ctx.message.delete()
+			await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 		else:
-			await ctx.send(f'No session data found for username {player}')
+			await ctx.send(f'No session data found for username {player}', delete_after= self.msg_delete_time)
 
 	@command(name="kills")
 	async def kills(self, ctx, player: Optional[str]):
@@ -106,12 +107,10 @@ class Commands(Cog):
 				except Exception:
 					pass
 				msg += f'{legend} kills: {kills}\n '
-			print(msg)
 			embed = Embed(title=username, description=msg)
-			# embed.add_field(name=username, value=msg, inline=True)
 				#(f'{ctx.author.mention} \n{msg}')
 			await ctx.send(embed=embed, delete_after= self.msg_delete_time)
-		else:
+		else: #currently doesn't get to this send message because the API returns a 404 code in the getHTTPrequest function.
 			await ctx.send(f'Username "{username}" not found', delete_after= self.msg_delete_time)
 
 	@Cog.listener()
