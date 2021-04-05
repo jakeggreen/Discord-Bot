@@ -37,7 +37,6 @@ class Commands(Cog):
 		#test to see if the bot will delete the command message as well as command response
 		#otherwise chat will fill up with seemingly unanswered command messages!
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
-
 		
 	@command(name="members", brief='Return list of server members')
 	async def members(self, ctx):

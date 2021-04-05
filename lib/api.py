@@ -52,9 +52,6 @@ class GG_Tracker(Api):
 		response = self.makeHTTPRequest('GET','/standard/profile/origin/' + username + '/sessions')
 		return response.json()
 
-	
-
-
 #code block for testing when running in-file.
 if __name__ == '__main__':
 	moz = Mozam()
