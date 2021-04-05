@@ -56,6 +56,7 @@ class Bot(Bot):
 
 	async def on_connect(self):
 		print(f'{self.user} has connected to Discord')
+		await self.change_presence(activity=discord.Game('Apex Legends'))
 
 	async def on_disconnect(self):
 		print(f'{self.user} has disconnected from Discord')
