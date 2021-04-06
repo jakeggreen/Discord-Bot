@@ -22,19 +22,19 @@ class Events(Cog):
 	@Cog.listener()
 	async def on_member_update(self, before, after):
 		print(before.activity, before.status, after.activity, after.status)
-		if before.status != 'online':
+		if before.status != 'online' and (before.activity == None and after.activity == None):
 			channel = before.guild.system_channel
 			await channel.send(f'{after.display_name} is now {after.status}!', delete_after=self.msg_delete_time)
 
 		if before.activity == None and after.activity != None:
 			channel = before.guild.system_channel
 			try:
-				party_min = after.activity.party['size'][0]
-				party_max = after.activity.party['size'][1]
-				print(party_min, party_max)
-				await channel.send(f'{after.display_name} is now playing {after.activity.name}. Party size is {party_min}/{party_max}')
+				party = str(after.activity.party.get('size'))
+				# party_max = after.activity.party['size'][1]
+				# print(party_min, party_max)
+				await channel.send(f'{after.display_name} is now playing {after.activity.name}. Started at: {after.activity.start}. Party size is {party}')
 			except Exception:
-				await channel.send(f'{after.display_name} is now playing {after.activity.name}.')
+				await channel.send(f'{after.display_name} is now playing {after.activity.name}. Started at: {after.activity.start}')
 		
 		if before.activity != None and after.activity == None:
 			channel = before.guild.system_channel
