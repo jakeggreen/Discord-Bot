@@ -94,11 +94,15 @@ class Commands(Cog):
 		"""Searches the Mozambique.re API for legend kills data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
 		await ctx.message.delete()
+		test= "asd"
+		test.mix()
+
 		if not player: 
 			username = ctx.author.display_name
 		else:
 			username = player
 		player_data = self.gg_tracker_api.getKills(username)
+
 		if player_data is not None:
 			msg = ""
 			for legend in all_legend_names_list:

@@ -2,5 +2,5 @@
 **.pyc
 **__pycache__
 **.orig
-__pycache__/
-cogs/__pycache__/
+__pycache__
+cogs/__pycache__

@@ -1,6 +1,7 @@
 import requests
 import json
 import datetime
+import traceback
 
 class Api(object):
 	def __init__(self, name, base_url, default_headers, default_params, auth_method):
@@ -12,11 +13,18 @@ class Api(object):
 
 	def makeHTTPRequest(self, http_method, url_extension, headers = {}, params = [], payload = {}):
 		try:
+			print("1")
 			resp = requests.request(http_method, self.base_url + url_extension, headers = self.default_headers | headers, params= self.default_params+params, data=payload)
+			print("2")
 			resp.raise_for_status()
+			print("3")
+			traceback.print_exc()
 			return resp
-		except requests.HTTPError as exception:
-			print(exception)
+		except Exception as exc:#
+			print("in http except")
+			print(exc)
+			traceback.print_exc()
+
 
 class Mozam(Api):
 	def __init__(self):

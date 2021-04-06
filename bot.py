@@ -1,11 +1,12 @@
 # Discord Python bot
-
+import traceback
 import os
 import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
 from glob import glob
 from discord.ext.commands import CommandNotFound
+import sys
 
 #Set the command prefix character
 PREFIX = '.'
@@ -44,7 +45,6 @@ class Bot(Bot):
 		print(f'Setup complete.')
 
 	def run(self):
-
 		print(f'Running setup...')
 		self.setup()
 
@@ -67,6 +67,14 @@ class Bot(Bot):
 		raise
 
 	async def on_command_error(self, ctx, exc):
+
+		print("on command error")
+		# print(exc)
+		# traceback.print_exc()
+		# traceback.print_stack()
+		print(exc)
+		print(type(exc))
+		print(sys.exc_info())
 		if isinstance(exc, CommandNotFound):
 			pass
 
