@@ -3,6 +3,7 @@ from discord.ext.commands import command
 from discord import Embed
 from discord.utils import get
 import discord
+import datetime
 
 class Events(Cog):
 	def __init__(self, bot):
@@ -38,8 +39,9 @@ class Events(Cog):
 				await channel.send(f'{after.display_name} is now playing {after.activity.name}. Started at: {after.activity.start}. Party size is {party_min}/{party_max}')
 
 			except Exception:
+				start = after.activity.start.strftime('%d-%m-%y %H:%M:%S')
 				embed = Embed(title=f'{after.display_name} is now playing\n{after.activity.name}')
-				embed.add_field(name=f'Started at:', value=f'{after.activity.start}')
+				embed.add_field(name=f'Started at:', value=start)
 				embed.set_thumbnail(url='https://cdn.discordapp.com/emojis/687049202089721910.png?v=1')
 				await channel.send(embed=embed)
 		
