@@ -6,6 +6,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot
 from glob import glob
 from discord.ext.commands import CommandNotFound
+from datetime import datetime
 
 #Set the command prefix character
 PREFIX = '.'
@@ -66,8 +67,11 @@ class Bot(Bot):
 			await args[0].send(f'Something went wrong.')
 		raise
 
+	#below logs when a command is successfully called, who did it and what command it was.
 	async def on_command_completion(self, ctx):
-		print(f'{ctx.author.display_name} successfully called {ctx.command}.')
+		now = datetime.now()
+		dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
+		print(f'{dt_string}: {ctx.author.display_name} successfully called command: {ctx.command}.')
 
 	async def on_command_error(self, ctx, exc):
 		if isinstance(exc, CommandNotFound):
