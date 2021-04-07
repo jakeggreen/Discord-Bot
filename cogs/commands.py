@@ -6,6 +6,7 @@ import discord
 import json
 import datetime
 import time
+from discord.errors import HTTPException, NotFound
 from lib.api import Api, Mozam, GG_Tracker
 from typing import Optional
 
@@ -62,7 +63,7 @@ class Commands(Cog):
 			username = ctx.author.display_name
 		else:
 			username = player
-		player_data = self.gg_tracker_api.getGames(player)
+		player_data = self.gg_tracker_api.getGames(username)
 		#check to see if player data is available
 		if player_data.get('data') and player_data.get('data').get('items'):
 			msg = ""
@@ -81,6 +82,12 @@ class Commands(Cog):
 		else:
 			await ctx.message.delete()
 			await ctx.send(f'No session data found for username {player}', delete_after= self.msg_delete_time)
+
+	# @games.error
+	# async def games_error(self, ctx, exc):
+	# 	print(exc, exc.original, error)
+	# 	if isinstance(exc.original, HTTPException):
+	# 		await ctx.send(f'No session data found for username', delete_after= self.msg_delete_time)
 
 	@command(name="kills", brief='Kill data for player for each legend')
 	async def kills(self, ctx, player: Optional[str]):

@@ -62,6 +62,17 @@ class Bot(Bot):
 	async def on_disconnect(self):
 		print(f'{self.user} has disconnected from Discord')
 
+	async def on_ready(self):
+		if not self.ready:
+			self.ready = True
+			print(f'{self.user} is ready')
+
+		else:
+			print(f'{self.user} reconnected')
+
+
+	#error handling below
+
 	async def on_error(self, err, *args, **kwargs):
 		if err == "on command error":
 			await args[0].send(f'Something went wrong.')
@@ -82,14 +93,6 @@ class Bot(Bot):
 
 		# else:
 		# 	raise exc
-
-	async def on_ready(self):
-		if not self.ready:
-			self.ready = True
-			print(f'{self.user} is ready')
-
-		else:
-			print(f'{self.user} reconnected')
 
 Bot = Bot()
 
