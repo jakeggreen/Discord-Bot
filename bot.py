@@ -70,7 +70,6 @@ class Bot(Bot):
 		else:
 			print(f'{self.user} reconnected')
 
-
 	#error handling below
 
 	async def on_error(self, err, *args, **kwargs):

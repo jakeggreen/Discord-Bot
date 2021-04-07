@@ -25,14 +25,7 @@ class Events(Cog):
 		pass
 
 	@Cog.listener()
-	async def change_presence(member, activity, status):
-		activity = member.activity.name
-		status = member.status
-		print(member.display_name, activity, status)
-
-	@Cog.listener()
 	async def on_member_update(self, before, after):
-		print(before.activity, before.status, after.activity, after.status)
 
 		if before.status != 'online' and (before.activity == None and after.activity == None): #doesn't give status updates whilst in a game
 			channel = before.guild.system_channel

@@ -65,29 +65,31 @@ class Commands(Cog):
 			username = player
 		player_data = self.gg_tracker_api.getGames(username)
 		#check to see if player data is available
-		if player_data.get('data') and player_data.get('data').get('items'):
-			msg = ""
-			for dates in player_data.get('data').get('items'):
-				start_dt = datetime.datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
-				end_dt = datetime.datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
-				begin = start_dt.strftime('%Y-%m-%d %H:%M')
-				duration = str(end_dt - start_dt)
-				for matches in dates.get('matches'):
-					legend = matches['metadata']['character']['displayValue']
-					rankscore = matches['stats']['rankScore']['value']
-					msg += f'\n{begin}, Duration: {duration} . Played with: {legend}, RP: {rankscore}'
-			embed = Embed(title=player, description=msg)
-			await ctx.message.delete()
-			await ctx.send(embed=embed, delete_after= self.msg_delete_time)
-		else:
-			await ctx.message.delete()
-			await ctx.send(f'No session data found for username {player}', delete_after= self.msg_delete_time)
+		# if player_data.get('data') and player_data.get('data').get('items'):
+		msg = ""
+		for dates in player_data.get('data').get('items'):
+			start_dt = datetime.datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
+			end_dt = datetime.datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
+			begin = start_dt.strftime('%Y-%m-%d %H:%M')
+			duration = str(end_dt - start_dt)
+			for matches in dates.get('matches'):
+				legend = matches['metadata']['character']['displayValue']
+				rankscore = matches['stats']['rankScore']['value']
+				msg += f'\n{begin}, Duration: {duration} . Played with: {legend}, RP: {rankscore}'
+		embed = Embed(title=player, description=msg)
+		await ctx.message.delete()
+		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
+		# else:
+		# 	await ctx.message.delete()
+		# 	await ctx.send(f'No session data found for username {player}', delete_after= self.msg_delete_time)
 
-	# @games.error
-	# async def games_error(self, ctx, exc):
-	# 	print(exc, exc.original, error)
-	# 	if isinstance(exc.original, HTTPException):
-	# 		await ctx.send(f'No session data found for username', delete_after= self.msg_delete_time)
+	@games.error
+	async def games_error(self, ctx, exc):
+		await ctx.message.delete()
+		if isinstance(exc.original, HTTPException):
+			await ctx.send(f'An error occurred.', delete_after= self.msg_delete_time)
+		else:
+			await ctx.send(f'No session data found. Please try another player name.', delete_after= self.msg_delete_time)
 
 	@command(name="kills", brief='Kill data for player for each legend')
 	async def kills(self, ctx, player: Optional[str]):
@@ -116,6 +118,14 @@ class Commands(Cog):
 		else: #currently doesn't get to this send message because the API returns a 404 code in the getHTTPrequest function.
 			await ctx.message.delete()
 			await ctx.send(f'Username "{username}" not found', delete_after= self.msg_delete_time)
+
+	@kills.error
+	async def kills_error(self, ctx, exc):
+		await ctx.message.delete()
+		if isinstance(exc.original, HTTPException):
+			await ctx.send(f'An error occurred.', delete_after= self.msg_delete_time)
+		else:
+			await ctx.send(f'No kill data found. Please try another player name.', delete_after= self.msg_delete_time)
 
 	@Cog.listener()
 	async def on_ready(self):
