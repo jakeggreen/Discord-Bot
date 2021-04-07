@@ -6,18 +6,18 @@ import discord
 import datetime
 import time
 
+def countdown(t):
+	while t:
+		mins, secs = divmod(t, 60)
+		timer = '{:02d}:{:02d}'.format(mins, secs)
+		print(timer, end="\r")
+		time.sleep(1)
+		t -= 1
+
 class Events(Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.msg_delete_time = 600
-
-	def countdown(t):
-		while t:
-			mins, secs = divmod(t, 60)
-			timer = '{:02d}:{:02d}'.format(mins, secs)
-			print(timer, end="\r")
-			time.sleep(1)
-			t -= 1
 
 	@Cog.listener()
 	async def on_message(self, message):
@@ -40,23 +40,12 @@ class Events(Cog):
 
 		if before.activity == None and after.activity != None:
 			channel = before.guild.system_channel
-			# print(after.activity.party)
-			try:
-				# party_min = after.activity.party['size'][0]
-				# party_max = after.activity.party['size'][1]
-				# print(party_min, party_max)
-				party_min = after.activity.party
-				print(part_min)
-				# await channel.send(f'{after.display_name} is now playing {after.activity.name}. Started at: {after.activity.start}. Party size is {party_min}/{party_max}')
-
-			except Exception:
-				timer = countdown(7200)
-				start = after.activity.start.strftime('%d-%m-%y %H:%M:%S')
-				embed = Embed(title=f'{after.display_name} is now playing\n{after.activity.name}')
-				embed.add_field(name=f'Started at:', value=start)
-				embed.add_field(name=f'Countdown:', value=timer)
-				embed.set_thumbnail(url='https://cdn.discordapp.com/emojis/687049202089721910.png?v=1')
-				await channel.send(embed=embed)
+			start = after.activity.start.strftime('%d-%m-%y %z %H:%M:%S')
+			embed = Embed(title=f'{after.display_name} is now playing\n{after.activity.name}')
+			embed.add_field(name=f'Started at:', value=start, inline=True)
+			# embed.add_field(name=f'Countdown:', value=countdown(7200), inline=True) -- currently just prints to terminal
+			embed.set_thumbnail(url='https://cdn.discordapp.com/emojis/687049202089721910.png?v=1')
+			await channel.send(embed=embed)
 		
 		if before.activity != None and after.activity == None:
 			channel = before.guild.system_channel
