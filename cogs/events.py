@@ -34,7 +34,7 @@ class Events(Cog):
 
 		if before.activity == None and after.activity != None:
 			channel = before.guild.system_channel
-			start = after.activity.start.strftime('%d-%m-%y %H:%M:%S')
+			start = after.activity.start 
 			formatted_start = (start + timedelta(hours=1)).strftime('%d-%m-%Y %H:%M:%S')
 			embed = Embed(title=f'{after.display_name} is now playing\n{after.activity.name}')
 			embed.add_field(name=f'Started at:', value=formatted_start, inline=True)
