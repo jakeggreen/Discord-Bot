@@ -12,12 +12,12 @@ class Events(Cog):
 		self.msg_delete_time = 600
 
 	def countdown(t):
-    while t:
-        mins, secs = divmod(t, 60)
-        timer = '{:02d}:{:02d}'.format(mins, secs)
-        print(timer, end="\r")
-        time.sleep(1)
-        t -= 1
+		while t:
+			mins, secs = divmod(t, 60)
+			timer = '{:02d}:{:02d}'.format(mins, secs)
+			print(timer, end="\r")
+			time.sleep(1)
+			t -= 1
 
 	@Cog.listener()
 	async def on_message(self, message):
@@ -42,10 +42,12 @@ class Events(Cog):
 			channel = before.guild.system_channel
 			# print(after.activity.party)
 			try:
-				party_min = after.activity.party['size'][0]
-				party_max = after.activity.party['size'][1]
-				print(party_min, party_max)
-				await channel.send(f'{after.display_name} is now playing {after.activity.name}. Started at: {after.activity.start}. Party size is {party_min}/{party_max}')
+				# party_min = after.activity.party['size'][0]
+				# party_max = after.activity.party['size'][1]
+				# print(party_min, party_max)
+				party_min = after.activity.party
+				print(part_min)
+				# await channel.send(f'{after.display_name} is now playing {after.activity.name}. Started at: {after.activity.start}. Party size is {party_min}/{party_max}')
 
 			except Exception:
 				timer = countdown(7200)
