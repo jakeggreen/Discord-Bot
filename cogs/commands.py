@@ -42,7 +42,7 @@ class Commands(Cog):
 		memberList = []
 		msg = ''
 		for member in ctx.guild.members:
-			if not member.name == 'Apex Stats':
+			if not member.bot:
 				memberList.append(member.display_name)
 			else:
 				pass
