@@ -33,6 +33,7 @@ class Events(Cog):
 	@Cog.listener()
 	async def on_member_update(self, before, after):
 		print(before.activity, before.status, after.activity, after.status)
+
 		if before.status != 'online' and (before.activity == None and after.activity == None): #doesn't give status updates whilst in a game
 			channel = before.guild.system_channel
 			embed = Embed(title=f'{after.display_name} is now {after.status}!')
@@ -40,7 +41,7 @@ class Events(Cog):
 
 		if before.activity == None and after.activity != None:
 			channel = before.guild.system_channel
-			start = after.activity.start.strftime('%d-%m-%y %z %H:%M:%S')
+			start = after.activity.start.strftime('%d-%m-%y %H:%M:%S')
 			embed = Embed(title=f'{after.display_name} is now playing\n{after.activity.name}')
 			embed.add_field(name=f'Started at:', value=start, inline=True)
 			# embed.add_field(name=f'Countdown:', value=countdown(7200), inline=True) -- currently just prints to terminal

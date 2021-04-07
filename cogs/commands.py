@@ -5,6 +5,7 @@ from discord import Embed
 import discord
 import json
 import datetime
+import time
 from lib.api import Api, Mozam, GG_Tracker
 from typing import Optional
 
@@ -30,8 +31,8 @@ class Commands(Cog):
 		next_map_name = map_rotation_data.get('next').get('map')
 		next_map_start = str(map_rotation_data.get('next').get('readableDate_start'))
 		embed = Embed(title=f'Apex Legends Map Rotation', description=f'Shows the current and upcoming maps on Apex Legends')
-		embed.add_field(name=f'Current Map', value=f'{map_name} for {map_time_remaining}')
-		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {next_map_start}')
+		embed.add_field(name=f'Current Map', value=f'{map_name} for another {map_time_remaining}', inline=True)
+		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {next_map_start}', inline=True)
 		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 		
@@ -57,7 +58,6 @@ class Commands(Cog):
 	async def games(self, ctx, player: Optional[str]):
 		"""Searches the tracker.gg API for recent session data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
-		await ctx.message.delete()
 		if not player: 
 			username = ctx.author.display_name
 		else:
@@ -69,7 +69,6 @@ class Commands(Cog):
 			for dates in player_data.get('data').get('items'):
 				start_dt = datetime.datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
 				end_dt = datetime.datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
-
 				begin = start_dt.strftime('%Y-%m-%d %H:%M')
 				duration = str(end_dt - start_dt)
 				for matches in dates.get('matches'):
@@ -86,8 +85,7 @@ class Commands(Cog):
 	@command(name="kills", brief='Kill data for player for each legend')
 	async def kills(self, ctx, player: Optional[str]):
 		"""Searches the Mozambique.re API for legend kills data for player - use '.members' to see list of server members. 
-		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
-		await ctx.message.delete()
+		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""		
 		if not player: 
 			username = ctx.author.display_name
 		else:
@@ -106,8 +104,10 @@ class Commands(Cog):
 					pass
 				msg += f'{legend} kills: {kills}\n '
 			embed = Embed(title=username, description=msg)
+			await ctx.message.delete()
 			await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 		else: #currently doesn't get to this send message because the API returns a 404 code in the getHTTPrequest function.
+			await ctx.message.delete()
 			await ctx.send(f'Username "{username}" not found', delete_after= self.msg_delete_time)
 
 	@Cog.listener()

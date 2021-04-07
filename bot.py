@@ -67,7 +67,7 @@ class Bot(Bot):
 		raise
 
 	async def on_command_completion(self, ctx):
-		print(f'{ctx.author.display_name} successfully called {ctx}.')
+		print(f'{ctx.author.display_name} successfully called {ctx.command}.')
 
 	async def on_command_error(self, ctx, exc):
 		if isinstance(exc, CommandNotFound):
