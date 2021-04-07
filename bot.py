@@ -66,6 +66,9 @@ class Bot(Bot):
 			await args[0].send(f'Something went wrong.')
 		raise
 
+	async def on_command_completion(self, ctx):
+		print(f'{ctx.author.display_name} successfully called {ctx}.')
+
 	async def on_command_error(self, ctx, exc):
 		if isinstance(exc, CommandNotFound):
 			pass
