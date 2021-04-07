@@ -4,8 +4,7 @@ from discord import Member
 from discord import Embed
 import discord
 import json
-import datetime
-import time
+from datetime import datetime, timedelta
 from discord.errors import HTTPException, NotFound
 from lib.api import Api, Mozam, GG_Tracker
 from typing import Optional
@@ -28,12 +27,13 @@ class Commands(Cog):
 		N.B. Might not always be accurate."""
 		map_rotation_data = self.mozam_api.getMaps()
 		map_name = map_rotation_data.get('current').get('map')
-		map_time_remaining = str(map_rotation_data.get('current').get('remainingTimer'))
+		map_time_remaining = map_rotation_data.get('current').get('remainingTimer')
 		next_map_name = map_rotation_data.get('next').get('map')
-		next_map_start = str(map_rotation_data.get('next').get('readableDate_start'))
+		next_map_start = datetime.strptime(map_rotation_data.get('next').get('readableDate_start'), '%Y-%m-%d %H:%M:%S') 
+		formatted_start = (next_map_start + timedelta(hours=1)).strftime('%d-%m-%Y %H:%M:%S') #API response is in UTC time
 		embed = Embed(title=f'Apex Legends Map Rotation', description=f'Shows the current and upcoming maps on Apex Legends')
 		embed.add_field(name=f'Current Map', value=f'{map_name} for another {map_time_remaining}', inline=True)
-		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {next_map_start}', inline=True)
+		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {formatted_start}', inline=True)
 		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 		

@@ -3,7 +3,7 @@ from discord.ext.commands import command
 from discord import Embed
 from discord.utils import get
 import discord
-import datetime
+from datetime import datetime, timedelta
 import time
 
 def countdown(t):
@@ -35,8 +35,9 @@ class Events(Cog):
 		if before.activity == None and after.activity != None:
 			channel = before.guild.system_channel
 			start = after.activity.start.strftime('%d-%m-%y %H:%M:%S')
+			formatted_start = (start + timedelta(hours=1)).strftime('%d-%m-%Y %H:%M:%S')
 			embed = Embed(title=f'{after.display_name} is now playing\n{after.activity.name}')
-			embed.add_field(name=f'Started at:', value=start, inline=True)
+			embed.add_field(name=f'Started at:', value=formatted_start, inline=True)
 			# embed.add_field(name=f'Countdown:', value=countdown(7200), inline=True) -- currently just prints to terminal
 			embed.set_thumbnail(url='https://cdn.discordapp.com/emojis/687049202089721910.png?v=1')
 			await channel.send(embed=embed)
