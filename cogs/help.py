@@ -57,17 +57,16 @@ class Help(Cog):
 		self.bot.remove_command('help') #remove the inbuilt help command for help
 
 	async def cmd_help(self, ctx, command):
-		await ctx.message.delete()
 		embed = Embed(title=f'Help with ".{command}"',
-					description= syntax(command),
+					description= f'Command name: {syntax(command)}',
 					colour=ctx.author.colour)
 		embed.add_field(name='Command description', value=command.help)
 		await ctx.send(embed=embed, delete_after=60)
 
 	@command(name='help', brief='Further help on a given command, fields in \\<> are optional parameters')
 	async def show_help(self, ctx, cmd: Optional[str]):
-		await ctx.message.delete()
 		if cmd is None:
+			await ctx.message.delete()
 			menu = MenuPages(source=HelpMenu(ctx, list(self.bot.commands)),
 							clear_reactions_after=True,
 							delete_message_after=True,
@@ -77,8 +76,10 @@ class Help(Cog):
 		else:
 			if (command := get(self.bot.commands, name=cmd)):
 				await self.cmd_help(ctx, command)
+				await ctx.message.delete()
 
 			else:
+				await ctx.message.delete()
 				await ctx.send(f'That command does not exist')
 
 

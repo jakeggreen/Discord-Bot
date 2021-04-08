@@ -8,10 +8,8 @@ import datetime
 from lib.api import Api, Mozam, GG_Tracker
 from typing import Optional
 
-
 all_legend_names_list = ["Bloodhound", "Gibraltar", "Lifeline", "Pathfinder", "Wraith", "Bangalore", "Caustic", "Mirage", 
 		"Octane", "Wattson", "Crypto", "Revenant", "Loba", "Rampart", "Horizon", "Fuse"]
-
 
 class Commands(Cog):
 	def __init__(self, bot):
@@ -94,8 +92,6 @@ class Commands(Cog):
 		"""Searches the Mozambique.re API for legend kills data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
 		await ctx.message.delete()
-		test= "asd"
-		test.mix()
 
 		if not player: 
 			username = ctx.author.display_name

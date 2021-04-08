@@ -67,22 +67,14 @@ class Bot(Bot):
 		raise
 
 	async def on_command_error(self, ctx, exc):
-
-		print("on command error")
-		# print(exc)
-		# traceback.print_exc()
-		# traceback.print_stack()
-		print(exc)
-		print(type(exc))
-		print(sys.exc_info())
 		if isinstance(exc, CommandNotFound):
 			pass
 
-		# elif hasattr(exc, "original"):
-		# 	raise exc.original
+		elif hasattr(exc, "original"):
+			raise exc.original
 
-		# else:
-		# 	raise exc
+		else:
+			raise exc
 
 	async def on_ready(self):
 		if not self.ready:

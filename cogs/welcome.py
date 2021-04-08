@@ -10,13 +10,12 @@ class Welcome(Cog):
 	@Cog.listener()
 	async def on_member_join(self, member):
 		channel = member.guild.system_channel
-		await channel.send(f'{member} has joined {member.guild.name}.')
+		await channel.send(f'{member.display_name} has joined {member.guild.name}.')
 
 	@Cog.listener()
 	async def on_member_remove(self, member):
 		channel = member.guild.system_channel
-		# await bot.send_message(discord.utils.get(server.channels, name = "channel_name"), (f'{member} has left {member.guild.name}.'))
-		await channel.send(f'{member} has left {member.guild.name}.')
+		await channel.send(f'{member.display_name} has left {member.guild.name}.')
 
 def setup(bot):
 	bot.add_cog(Welcome(bot))
