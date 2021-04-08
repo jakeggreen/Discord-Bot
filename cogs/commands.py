@@ -127,18 +127,26 @@ class Commands(Cog):
 		else:
 			await ctx.send(f'No kill data found. Please try another player name.', delete_after= self.msg_delete_time)
 
-	@command(name='status', dsecription='Shows current server status; up, down or no data.')
+	@command(name='status', dsecription='Shows current server status by server type.')
 	async def server_status(self, ctx):
 		server_status_data =  self.mozam_api.getServerStatus()
-		embed = Embed(title=f'Apex Legends Server Status', description=f'Shows current server status; up, down or no data.')
+
+		servers_list = ('Origin_login','EA_accounts','ApexOauth_Steam','ApexOauth_Crossplay','ApexOauth_PC')
+
+		location_list = ('EU-West','EU-East')
+
+		embed = Embed(title=f'Apex Legends Server Status', description=f'Shows current server status by server type.')
+		embed.set_footer(text='See more details at https://apexlegendsstatus.com')
+
 		for server_type, item in server_status_data.items():
-			if server_type != 'Mozambiquehere_StatsAPI':
+			if server_type in servers_list:
 				for location in item.items():
 					server_location = location[0]
-					server_status = '\U00002705' if location[1]['Status'] == 'UP' else '\U0000274C'
-					# time_stamp = datetime.datetime.strptime(location[1]['QueryTimestamp'],'%d-%m-%Y %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S')
-					embed.add_field(name=f'{server_type}', value=f'{server_location}: {server_status}', inline=True)
-		embed.set_footer(text='See more details at https://apexlegendsstatus.com')
+					if server_location in location_list:
+						server_status = '\U00002705' if location[1]['Status'] == 'UP' else '\U0000274C'
+						time_stamp = datetime.fromtimestamp(location[1]['QueryTimestamp']).strftime('%H:%M:%S')
+						embed.add_field(name=f'{server_type}:\n', value=f'{server_location}:\n{server_status}\nTimestamp:\n{time_stamp}', inline=True)
+		
 		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 
