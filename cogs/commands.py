@@ -4,12 +4,15 @@ from discord import Member
 from discord import Embed
 import discord
 import json
-import datetime
+from datetime import datetime, timedelta
+from discord.errors import HTTPException, NotFound
 from lib.api import Api, Mozam, GG_Tracker
 from typing import Optional
 
+
 all_legend_names_list = ["Bloodhound", "Gibraltar", "Lifeline", "Pathfinder", "Wraith", "Bangalore", "Caustic", "Mirage", 
 		"Octane", "Wattson", "Crypto", "Revenant", "Loba", "Rampart", "Horizon", "Fuse"]
+
 
 class Commands(Cog):
 	def __init__(self, bot):
@@ -22,27 +25,24 @@ class Commands(Cog):
 	async def map(self, ctx):
 		"""Shows information about the current and upcoming map rotations for Apex Legends, based on data from the Mozambique.re API.
 		N.B. Might not always be accurate."""
-		await ctx.message.delete()
 		map_rotation_data = self.mozam_api.getMaps()
 		map_name = map_rotation_data.get('current').get('map')
-		map_time_remaining = str(map_rotation_data.get('current').get('remainingTimer'))
+		map_time_remaining = map_rotation_data.get('current').get('remainingTimer')
 		next_map_name = map_rotation_data.get('next').get('map')
-		next_map_start = str(map_rotation_data.get('next').get('readableDate_start'))
-
+		next_map_start = datetime.strptime(map_rotation_data.get('next').get('readableDate_start'), '%Y-%m-%d %H:%M:%S') 
+		formatted_start = (next_map_start + timedelta(hours=1)).strftime('%d-%m-%Y %H:%M:%S') #API response is in UTC time
 		embed = Embed(title=f'Apex Legends Map Rotation', description=f'Shows the current and upcoming maps on Apex Legends')
-		embed.add_field(name=f'Current Map', value=f'{map_name} for {map_time_remaining}')
-		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {next_map_start}')
-		#test to see if the bot will delete the command message as well as command response
-		#otherwise chat will fill up with seemingly unanswered command messages!
+		embed.add_field(name=f'Current Map', value=f'{map_name} for another {map_time_remaining}', inline=True)
+		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {formatted_start}', inline=True)
+		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 		
 	@command(name="members", brief='Return list of server members')
 	async def members(self, ctx):
-		await ctx.message.delete()
 		memberList = []
 		msg = ''
 		for member in ctx.guild.members:
-			if not member.name == 'Apex Stats':
+			if not member.bot:
 				memberList.append(member.display_name)
 			else:
 				pass
@@ -52,53 +52,54 @@ class Commands(Cog):
 					description=f'Shows the current members of the server',
 					colour=ctx.author.colour)
 		embed.add_field(name=f'Member List', value=msg)
+		await ctx.message.delete()
 		await ctx.send(embed=embed ,delete_after= self.msg_delete_time)
 
 	@command(name="games", brief='Lists all available session data for player/self')
 	async def games(self, ctx, player: Optional[str]):
 		"""Searches the tracker.gg API for recent session data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
-		await ctx.message.delete()
 		if not player: 
 			username = ctx.author.display_name
 		else:
 			username = player
-		# if not player:
-		# 	await ctx.send(f'No player name provided');
-		player_data = self.gg_tracker_api.getGames(player)
+		player_data = self.gg_tracker_api.getGames(username)
 		#check to see if player data is available
-		if player_data.get('data') and player_data.get('data').get('items'):
-			#get the start and end dates for matches
-			msg = ""
-			for dates in player_data.get('data').get('items'):
-				start_dt = datetime.datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
-				end_dt = datetime.datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
+		# if player_data.get('data') and player_data.get('data').get('items'):
+		msg = ""
+		for dates in player_data.get('data').get('items'):
+			start_dt = datetime.datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
+			end_dt = datetime.datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
+			begin = start_dt.strftime('%Y-%m-%d %H:%M')
+			duration = str(end_dt - start_dt)
+			for matches in dates.get('matches'):
+				legend = matches['metadata']['character']['displayValue']
+				rankscore = matches['stats']['rankScore']['value']
+				msg += f'\n{begin}, Duration: {duration} . Played with: {legend}, RP: {rankscore}'
+		embed = Embed(title=player, description=msg)
+		await ctx.message.delete()
+		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
+		# else:
+		# 	await ctx.message.delete()
+		# 	await ctx.send(f'No session data found for username {player}', delete_after= self.msg_delete_time)
 
-				begin = start_dt.strftime('%Y-%m-%d %H:%M')
-				duration = str(end_dt - start_dt)
-				#for each match get the legend used and the ending rank score
-				for matches in dates.get('matches'):
-					legend = matches['metadata']['character']['displayValue']
-					rankscore = matches['stats']['rankScore']['value']
-					msg += f'\n{begin}, Duration: {duration} . Played with: {legend}, RP: {rankscore}'
-			embed = Embed(title=player, description=msg)
-			
-			await ctx.send(embed=embed, delete_after= self.msg_delete_time)
+	@games.error
+	async def games_error(self, ctx, exc):
+		await ctx.message.delete()
+		if isinstance(exc.original, HTTPException):
+			await ctx.send(f'An error occurred.', delete_after= self.msg_delete_time)
 		else:
-			await ctx.send(f'No session data found for username {player}', delete_after= self.msg_delete_time)
+			await ctx.send(f'No session data found. Please try another player name.', delete_after= self.msg_delete_time)
 
 	@command(name="kills", brief='Kill data for player for each legend')
 	async def kills(self, ctx, player: Optional[str]):
 		"""Searches the Mozambique.re API for legend kills data for player - use '.members' to see list of server members. 
-		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
-		await ctx.message.delete()
-
+		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""		
 		if not player: 
 			username = ctx.author.display_name
 		else:
 			username = player
 		player_data = self.gg_tracker_api.getKills(username)
-
 		if player_data is not None:
 			msg = ""
 			for legend in all_legend_names_list:
@@ -112,10 +113,42 @@ class Commands(Cog):
 					pass
 				msg += f'{legend} kills: {kills}\n '
 			embed = Embed(title=username, description=msg)
-				#(f'{ctx.author.mention} \n{msg}')
+			await ctx.message.delete()
 			await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 		else: #currently doesn't get to this send message because the API returns a 404 code in the getHTTPrequest function.
+			await ctx.message.delete()
 			await ctx.send(f'Username "{username}" not found', delete_after= self.msg_delete_time)
+
+	@kills.error
+	async def kills_error(self, ctx, exc):
+		await ctx.message.delete()
+		if isinstance(exc.original, HTTPException):
+			await ctx.send(f'An error occurred.', delete_after= self.msg_delete_time)
+		else:
+			await ctx.send(f'No kill data found. Please try another player name.', delete_after= self.msg_delete_time)
+
+	@command(name='status', dsecription='Shows current server status by server type.')
+	async def server_status(self, ctx):
+		server_status_data =  self.mozam_api.getServerStatus()
+
+		servers_list = ('Origin_login','EA_accounts','ApexOauth_Steam','ApexOauth_Crossplay','ApexOauth_PC')
+
+		location_list = ('EU-West','EU-East')
+
+		embed = Embed(title=f'Apex Legends Server Status', description=f'Shows current server status by server type.')
+		embed.set_footer(text='See more details at https://apexlegendsstatus.com')
+
+		for server_type, item in server_status_data.items():
+			if server_type in servers_list:
+				for location in item.items():
+					server_location = location[0]
+					if server_location in location_list:
+						server_status = '\U00002705' if location[1]['Status'] == 'UP' else '\U0000274C'
+						time_stamp = datetime.fromtimestamp(location[1]['QueryTimestamp']).strftime('%H:%M:%S')
+						embed.add_field(name=f'{server_type}:\n', value=f'{server_location}:\n{server_status}\nTimestamp:\n{time_stamp}', inline=True)
+		
+		await ctx.message.delete()
+		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 
 	@Cog.listener()
 	async def on_ready(self):
