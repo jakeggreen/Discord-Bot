@@ -135,7 +135,7 @@ class Commands(Cog):
 			if server_type != 'Mozambiquehere_StatsAPI':
 				for location in item.items():
 					server_location = location[0]
-					server_status = location[1]['Status']
+					server_status = '\U00002705' if location[1]['Status'] == 'UP' else '\U0000274C'
 					# time_stamp = datetime.datetime.strptime(location[1]['QueryTimestamp'],'%d-%m-%Y %H:%M:%S').strftime('%d-%m-%Y %H:%M:%S')
 					embed.add_field(name=f'{server_type}', value=f'{server_location}: {server_status}', inline=True)
 		embed.set_footer(text='See more details at https://apexlegendsstatus.com')
