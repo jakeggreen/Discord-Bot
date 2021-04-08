@@ -7,9 +7,7 @@ from discord.ext.commands import Bot
 from glob import glob
 from discord.ext.commands import CommandNotFound
 from datetime import datetime
-
-#Set the command prefix character
-PREFIX = '.'
+from settings import Bot_Settings
 
 #Set list comprehension for the cogs available for the bot (includes command script)
 COGS = [path.split("\\")[-1][:-3] for path in glob("./cogs/*.py")]
@@ -26,15 +24,14 @@ class Ready(object):
 	def all_ready(self):
 		return all([getattr(self, cog) for cog in COGS])
 
-class Bot(Bot):
+class Bot(Bot,Bot_Settings):
 	def __init__(self):
-		self.PREFIX = PREFIX
 		self.ready = False
 		self.cogs_ready = Ready()
 		self.guild = None
-
+		Bot_Settings.__init__(self)
 		super().__init__(
-			command_prefix = PREFIX,
+			command_prefix = self.PREFIX,
 			intents=discord.Intents.all())
 
 	def setup(self):

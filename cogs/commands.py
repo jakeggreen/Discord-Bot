@@ -29,11 +29,11 @@ class Commands(Cog):
 		map_name = map_rotation_data.get('current').get('map')
 		map_time_remaining = map_rotation_data.get('current').get('remainingTimer')
 		next_map_name = map_rotation_data.get('next').get('map')
-		next_map_start = datetime.strptime(map_rotation_data.get('next').get('readableDate_start'), '%Y-%m-%d %H:%M:%S') 
-		formatted_start = (next_map_start + timedelta(hours=1)).strftime('%d-%m-%Y %H:%M:%S') #API response is in UTC time
+		next_map_start = datetime.fromtimestamp(map_rotation_data.get('next').get('start'), self.bot.tz).strftime(self.bot.date_f1)
+
 		embed = Embed(title=f'Apex Legends Map Rotation', description=f'Shows the current and upcoming maps on Apex Legends')
 		embed.add_field(name=f'Current Map', value=f'{map_name} for another {map_time_remaining}', inline=True)
-		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {formatted_start}', inline=True)
+		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {next_map_start}', inline=True)
 		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 		
@@ -68,9 +68,9 @@ class Commands(Cog):
 		# if player_data.get('data') and player_data.get('data').get('items'):
 		msg = ""
 		for dates in player_data.get('data').get('items'):
-			start_dt = datetime.datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
-			end_dt = datetime.datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ')
-			begin = start_dt.strftime('%Y-%m-%d %H:%M')
+			start_dt = datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ').astimezone(self.bot.tz)
+			end_dt = datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ').astimezone(self.bot.tz)
+			begin = start_dt.strftime(self.bot.date_f1)
 			duration = str(end_dt - start_dt)
 			for matches in dates.get('matches'):
 				legend = matches['metadata']['character']['displayValue']
@@ -100,24 +100,21 @@ class Commands(Cog):
 		else:
 			username = player
 		player_data = self.gg_tracker_api.getKills(username)
-		if player_data is not None:
-			msg = ""
-			for legend in all_legend_names_list:
-				kills = 0;
-				try:
-					for item in player_data["data"]:
-						if item.get("metadata").get("name") == legend:
-							if item.get("stats") and item.get("stats").get("kills") and item.get("stats").get("kills").get("value"):
-								kills = int(item["stats"]["kills"]["value"])
-				except Exception:
-					pass
-				msg += f'{legend} kills: {kills}\n '
-			embed = Embed(title=username, description=msg)
-			await ctx.message.delete()
-			await ctx.send(embed=embed, delete_after= self.msg_delete_time)
-		else: #currently doesn't get to this send message because the API returns a 404 code in the getHTTPrequest function.
-			await ctx.message.delete()
-			await ctx.send(f'Username "{username}" not found', delete_after= self.msg_delete_time)
+	
+		msg = ""
+		for legend in all_legend_names_list:
+			kills = 0;
+			try:
+				for item in player_data["data"]:
+					if item.get("metadata").get("name") == legend:
+						if item.get("stats") and item.get("stats").get("kills") and item.get("stats").get("kills").get("value"):
+							kills = int(item["stats"]["kills"]["value"])
+			except Exception:
+				pass
+			msg += f'{legend} kills: {kills}\n '
+		embed = Embed(title=username, description=msg)
+		await ctx.message.delete()
+		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 
 	@kills.error
 	async def kills_error(self, ctx, exc):
@@ -144,7 +141,7 @@ class Commands(Cog):
 					server_location = location[0]
 					if server_location in location_list:
 						server_status = '\U00002705' if location[1]['Status'] == 'UP' else '\U0000274C'
-						time_stamp = datetime.fromtimestamp(location[1]['QueryTimestamp']).strftime('%H:%M:%S')
+						time_stamp = datetime.fromtimestamp(location[1]['QueryTimestamp'], tz).strftime('%H:%M:%S')
 						embed.add_field(name=f'{server_type}:\n', value=f'{server_location}:\n{server_status}\nTimestamp:\n{time_stamp}', inline=True)
 		
 		await ctx.message.delete()
