@@ -141,7 +141,7 @@ class Commands(Cog):
 					server_location = location[0]
 					if server_location in location_list:
 						server_status = '\U00002705' if location[1]['Status'] == 'UP' else '\U0000274C'
-						time_stamp = datetime.fromtimestamp(location[1]['QueryTimestamp'], tz).strftime('%H:%M:%S')
+						time_stamp = datetime.fromtimestamp(location[1]['QueryTimestamp'], self.bot.tz).strftime('%H:%M:%S')
 						embed.add_field(name=f'{server_type}:\n', value=f'{server_location}:\n{server_status}\nTimestamp:\n{time_stamp}', inline=True)
 		
 		await ctx.message.delete()
