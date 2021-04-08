@@ -33,6 +33,10 @@ class Mozam(Api):
 		response = self.makeHTTPRequest('GET','/maprotation')
 		return response.json()
 
+	def getServerStatus(self):
+		response = self.makeHTTPRequest('GET', '/servers')
+		return response.json()
+
 class GG_Tracker(Api):
 	def __init__(self):
 		name = 'GG Tracker'

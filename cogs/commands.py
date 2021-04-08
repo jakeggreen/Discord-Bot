@@ -127,6 +127,16 @@ class Commands(Cog):
 		else:
 			await ctx.send(f'No kill data found. Please try another player name.', delete_after= self.msg_delete_time)
 
+	@command(name='status', dsecription='Shows current server status; up, down or no data.')
+	async def server_status(self, ctx):
+		server_status_data =  self.mozam_api.getServerStatus()
+		print(server_status_data)
+		embed = Embed(title=f'Apex Legends Server Status', description=f'Shows current server status; up, down or no data.')
+		embed.add_field(name=f'Current status', value=f'', inline=True)
+		embed.set_footer(text='See more details at https://apexlegendsstatus.com')
+		await ctx.message.delete()
+		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
+
 	@Cog.listener()
 	async def on_ready(self):
 		if not self.bot.ready:
