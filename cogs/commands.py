@@ -130,9 +130,13 @@ class Commands(Cog):
 	@command(name='status', dsecription='Shows current server status; up, down or no data.')
 	async def server_status(self, ctx):
 		server_status_data =  self.mozam_api.getServerStatus()
-		print(server_status_data)
 		embed = Embed(title=f'Apex Legends Server Status', description=f'Shows current server status; up, down or no data.')
-		embed.add_field(name=f'Current status', value=f'', inline=True)
+		for server_type, item in server_status_data.items():
+			if server_type != 'Mozambiquehere_StatsAPI':
+				for location in item.items():
+					server_location = location[0]
+					server_status = location[1]['Status']
+					embed.add_field(name=f'{server_type}', value=f'{server_location}: {server_status}', inline=True)
 		embed.set_footer(text='See more details at https://apexlegendsstatus.com')
 		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
