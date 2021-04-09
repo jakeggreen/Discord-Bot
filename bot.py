@@ -9,7 +9,6 @@ from discord.ext.commands import CommandNotFound
 from datetime import datetime
 from settings import Bot_Settings
 
-#Set list comprehension for the cogs available for the bot (includes command script)
 COGS = [path.split("\\")[-1][:-3] for path in glob("./cogs/*.py")]
 
 class Ready(object):
@@ -24,7 +23,7 @@ class Ready(object):
 	def all_ready(self):
 		return all([getattr(self, cog) for cog in COGS])
 
-class Bot(Bot,Bot_Settings):
+class Bot(Bot, Bot_Settings):
 	def __init__(self):
 		self.ready = False
 		self.cogs_ready = Ready()
@@ -73,10 +72,9 @@ class Bot(Bot,Bot_Settings):
 			await args[0].send(f'Something went wrong.')
 		raise
 
-	#below logs when a command is successfully called, who did it and what command it was.
 	async def on_command_completion(self, ctx):
 		now = datetime.now()
-		dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
+		dt_string = now.strftime(self.date_f1)
 		print(f'{dt_string}: {ctx.author.display_name} successfully called command: {ctx.command}.')
 
 	async def on_command_error(self, ctx, exc):

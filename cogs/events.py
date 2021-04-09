@@ -3,7 +3,7 @@ from discord.ext.commands import command
 from discord import Embed
 from discord.utils import get
 import discord
-from datetime import datetime, timedelta
+from datetime import datetime
 import time
 
 def countdown(t):
@@ -18,10 +18,10 @@ class Events(Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.msg_delete_time = 600
+		self.status_delete_time = 60
 
 	@Cog.listener()
 	async def on_message(self, message):
-		# message.channel.send(f'Hello {message.author}')
 		pass
 
 	@Cog.listener()
@@ -30,7 +30,7 @@ class Events(Cog):
 		if before.status != 'online' and (before.activity == None and after.activity == None): #doesn't give status updates whilst in a game
 			channel = before.guild.system_channel
 			embed = Embed(title=f'{after.display_name} is now {after.status}!')
-			await channel.send(embed=embed, delete_after=self.msg_delete_time)
+			await channel.send(embed=embed, delete_after=self.status_delete_time)
 
 		if before.activity == None and after.activity != None:
 			channel = before.guild.system_channel

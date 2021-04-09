@@ -16,9 +16,7 @@ class Welcome(Cog):
 		embed.set_thumbnail(url='https://cdn.discordapp.com/emojis/687049202089721910.png?v=1')
 		embed.set_footer(text=f'Admins: {member.guild.owner.display_name}')
 		embed.set_image(url='https://images2.minutemediacdn.com/image/upload/c_fill,w_720,ar_16:9,f_auto,q_auto,g_auto/shape/cover/sport/dataimagepngbase64iVBORw0KGgoAAAANSUhEUgAAA7wAAAND-4d9e44dcd8d8dc1578ad9eeffadcc993.jpg')
-
 		embed_welcome = Embed(title=f'{member.display_name} has joined {member.guild.name}.')
-
 		await channel.send(embed=embed_welcome)
 		await channel.send(embed=embed, delete_after=self.msg_delete_time)
 
