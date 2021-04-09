@@ -4,15 +4,16 @@ import datetime
 import traceback
 
 class Api(object):
-	def __init__(self, name, base_url, default_headers, default_params, auth_method):
+	def __init__(self, name, base_url, default_headers, default_params, auth_method, std_date_format):
 		self.name = name
 		self.base_url = base_url
 		self.default_headers = default_headers
 		self.default_params = default_params
 		self.auth_method = auth_method
+		self.std_date_format = std_date_format
 
 	def makeHTTPRequest(self, http_method, url_extension, headers = {}, params = [], payload = {}):
-		resp = requests.request(http_method, self.base_url + url_extension, headers = self.default_headers | headers, params= self.default_params+params, data=payload)
+		resp = requests.request(http_method, self.base_url + url_extension, headers = self.default_headers | headers,params= self.default_params+params, data=payload)
 		resp.raise_for_status()
 		return resp
 
@@ -24,8 +25,9 @@ class Mozam(Api):
 		self.APIKey = APIKey_file.read()
 		default_params = [('auth', self.APIKey)]
 		default_headers = {}
-
-		super().__init__(name, base_url, default_headers, default_params, 'URL Params')
+		std_dt_format = None
+	
+		super().__init__(name, base_url, default_headers, default_params, 'URL Params',  std_dt_format)
 
 	def getMaps(self):
 		response = self.makeHTTPRequest('GET','/maprotation')
@@ -43,8 +45,9 @@ class GG_Tracker(Api):
 		self.APIKey = APIKey_file.read()
 		default_params = []
 		default_headers = {'TRN-Api-Key': self.APIKey}
+		std_dt_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
-		super().__init__(name, base_url,default_headers, default_params, 'Non-Standard Header')
+		super().__init__(name, base_url,default_headers, default_params, 'Non-Standard Header', std_dt_format)
 
 	def getKills(self, username):
 		response = self.makeHTTPRequest('GET','/standard/profile/origin/' + username + '/segments/legend')

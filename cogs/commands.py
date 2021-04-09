@@ -24,7 +24,8 @@ class Commands(Cog):
 	async def map(self, ctx):
 		"""Shows information about the current and upcoming map rotations for Apex Legends, based on data from the Mozambique.re API.
 		N.B. Might not always be accurate."""
-		map_rotation_data = self.mozam_api.getMaps()
+		api = self.mozam_api
+		map_rotation_data = api.getMaps()
 		map_name = map_rotation_data.get('current').get('map')
 		map_time_remaining = map_rotation_data.get('current').get('remainingTimer')
 		next_map_name = map_rotation_data.get('next').get('map')
@@ -56,16 +57,17 @@ class Commands(Cog):
 	async def games(self, ctx, player: Optional[str]):
 		"""Searches the tracker.gg API for recent session data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""
+		api = self.gg_tracker_api
 		if not player: 
 			username = ctx.author.display_name
 		else:
 			username = player
-		player_data = self.gg_tracker_api.getGames(username)
+		player_data = api.getGames(username)
 		msg = ""
 		for dates in player_data.get('data').get('items'):
 			datetime.fromisoformat
-			start_dt = datetime.fromisoformat(dates['metadata']['startDate']['value'])
-			end_dt = datetime.fromisoformat(dates['metadata']['endDate']['value'])
+			start_dt = datetime.strptime(dates['metadata']['startDate']['value'], api.std_date_format)
+			end_dt = datetime.strptime(dates['metadata']['endDate']['value'], api.std_date_format)
 			begin = u.localizeTimezoneStr(start_dt,self.bot.tz,self.bot.date_f1)
 			duration = str(end_dt - start_dt)
 			for matches in dates.get('matches'):
@@ -88,11 +90,12 @@ class Commands(Cog):
 	async def kills(self, ctx, player: Optional[str]):
 		"""Searches the Mozambique.re API for legend kills data for player - use '.members' to see list of server members. 
 		Members of the server should set their nickname equal to their Steam/Origin name to allow searching."""		
+		api = self.gg_tracker_api
 		if not player: 
 			username = ctx.author.display_name
 		else:
 			username = player
-		player_data = self.gg_tracker_api.getKills(username)
+		player_data = api.getKills(username)
 	
 		msg = ""
 		for legend in all_legend_names_list:
@@ -119,7 +122,8 @@ class Commands(Cog):
 
 	@command(name='status', description='Shows current server status by server type.')
 	async def server_status(self, ctx):
-		server_status_data =  self.mozam_api.getServerStatus()
+		api = self.mozam_api
+		server_status_data = api.getServerStatus()
 
 		servers_list = ('Origin_login','EA_accounts','ApexOauth_Steam','ApexOauth_Crossplay','ApexOauth_PC')
 
