@@ -4,15 +4,14 @@ from discord import Member
 from discord import Embed
 import discord
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from discord.errors import HTTPException, NotFound
 from lib.api import Api, Mozam, GG_Tracker
+import lib.util as u
 from typing import Optional
-
 
 all_legend_names_list = ["Bloodhound", "Gibraltar", "Lifeline", "Pathfinder", "Wraith", "Bangalore", "Caustic", "Mirage", 
 		"Octane", "Wattson", "Crypto", "Revenant", "Loba", "Rampart", "Horizon", "Fuse"]
-
 
 class Commands(Cog):
 	def __init__(self, bot):
@@ -29,7 +28,7 @@ class Commands(Cog):
 		map_name = map_rotation_data.get('current').get('map')
 		map_time_remaining = map_rotation_data.get('current').get('remainingTimer')
 		next_map_name = map_rotation_data.get('next').get('map')
-		next_map_start = datetime.fromtimestamp(map_rotation_data.get('next').get('start'), self.bot.tz).strftime(self.bot.date_f1)
+		next_map_start = u.localizeTimezoneStr(datetime.fromtimestamp(map_rotation_data.get('next').get('start'), timezone.utc), self.bot.tz, self.bot.date_f1)
 
 		embed = Embed(title=f'Apex Legends Map Rotation', description=f'Shows the current and upcoming maps on Apex Legends')
 		embed.add_field(name=f'Current Map', value=f'{map_name} for another {map_time_remaining}', inline=True)
@@ -68,9 +67,10 @@ class Commands(Cog):
 		# if player_data.get('data') and player_data.get('data').get('items'):
 		msg = ""
 		for dates in player_data.get('data').get('items'):
-			start_dt = datetime.strptime(dates['metadata']['startDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ').astimezone(self.bot.tz)
-			end_dt = datetime.strptime(dates['metadata']['endDate']['value'],'%Y-%m-%dT%H:%M:%S.%fZ').astimezone(self.bot.tz)
-			begin = start_dt.strftime(self.bot.date_f1)
+			datetime.fromisoformat
+			start_dt = datetime.fromisoformat(dates['metadata']['startDate']['value'])
+			end_dt = datetime.fromisoformat(dates['metadata']['endDate']['value'])
+			begin = u.localizeTimezoneStr(start_dt,self.bot.tz,self.bot.date_f1)
 			duration = str(end_dt - start_dt)
 			for matches in dates.get('matches'):
 				legend = matches['metadata']['character']['displayValue']
@@ -124,7 +124,7 @@ class Commands(Cog):
 		else:
 			await ctx.send(f'No kill data found. Please try another player name.', delete_after= self.msg_delete_time)
 
-	@command(name='status', dsecription='Shows current server status by server type.')
+	@command(name='status', description='Shows current server status by server type.')
 	async def server_status(self, ctx):
 		server_status_data =  self.mozam_api.getServerStatus()
 
@@ -141,7 +141,7 @@ class Commands(Cog):
 					server_location = location[0]
 					if server_location in location_list:
 						server_status = '\U00002705' if location[1]['Status'] == 'UP' else '\U0000274C'
-						time_stamp = datetime.fromtimestamp(location[1]['QueryTimestamp'], self.bot.tz).strftime('%H:%M:%S')
+						time_stamp = u.localizeTimezoneStr(datetime.fromtimestamp(location[1]['QueryTimestamp'], timezone.utc), self.bot.tz, '%H:%M:%S')
 						embed.add_field(name=f'{server_type}:\n', value=f'{server_location}:\n{server_status}\nTimestamp:\n{time_stamp}', inline=True)
 		
 		await ctx.message.delete()

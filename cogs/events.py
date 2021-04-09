@@ -5,14 +5,7 @@ from discord.utils import get
 import discord
 from datetime import datetime, timedelta
 import time
-
-def countdown(t):
-	while t:
-		mins, secs = divmod(t, 60)
-		timer = '{:02d}:{:02d}'.format(mins, secs)
-		print(timer, end="\r")
-		time.sleep(1)
-		t -= 1
+import lib.util as u
 
 class Events(Cog):
 	def __init__(self, bot):
@@ -34,13 +27,10 @@ class Events(Cog):
 
 		if before.activity == None and after.activity != None:
 			channel = before.guild.system_channel
-		
-			print(after.activity.start)
-			print(after.activity.start.astimezone(self.bot.tz))
-			start = (after.activity.start.astimezone(self.bot.tz)).strftime(self.bot.date_f1)
+			start = u.localizeTimezoneStr(after.activity.start, self.bot.tz, self.bot.date_f1)
 			embed = Embed(title=f'{after.display_name} is now playing\n{after.activity.name}')
 			embed.add_field(name=f'Started at:', value=start, inline=True)
-			# embed.add_field(name=f'Countdown:', value=countdown(7200), inline=True) -- currently just prints to terminal
+			# embed.add_field(name=f'Countdown:', value=u.countdown(7200), inline=True) -- currently just prints to terminal
 			embed.set_thumbnail(url='https://cdn.discordapp.com/emojis/687049202089721910.png?v=1')
 			await channel.send(embed=embed)
 		
