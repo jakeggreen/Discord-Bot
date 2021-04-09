@@ -30,10 +30,9 @@ class Commands(Cog):
 		map_time_remaining = map_rotation_data.get('current').get('remainingTimer')
 		next_map_name = map_rotation_data.get('next').get('map')
 		next_map_start = u.localizeTimezoneStr(datetime.fromtimestamp(map_rotation_data.get('next').get('start'), timezone.utc), self.bot.tz, self.bot.date_f1)
-
 		embed = Embed(title=f'Apex Legends Map Rotation', description=f'Shows the current and upcoming maps on Apex Legends')
 		embed.add_field(name=f'Current Map', value=f'{map_name} for another {map_time_remaining}', inline=True)
-		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {formatted_start}', inline=True)
+		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {next_map_start}', inline=True)
 		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 		

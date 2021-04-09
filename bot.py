@@ -78,6 +78,9 @@ class Bot(Bot, Bot_Settings):
 		print(f'{dt_string}: {ctx.author.display_name} successfully called command: {ctx.command}.')
 
 	async def on_command_error(self, ctx, exc):
+		now = datetime.now()
+		dt_string = now.strftime(self.date_f1)
+		print(f'{dt_string}: {ctx.author.display_name} failed to call command: {ctx.command}.')
 		if isinstance(exc, CommandNotFound):
 			pass
 
