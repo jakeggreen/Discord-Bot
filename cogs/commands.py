@@ -32,7 +32,7 @@ class Commands(Cog):
 
 		embed = Embed(title=f'Apex Legends Map Rotation', description=f'Shows the current and upcoming maps on Apex Legends')
 		embed.add_field(name=f'Current Map', value=f'{map_name} for another {map_time_remaining}', inline=True)
-		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {next_map_start}', inline=True)
+		embed.add_field(name=f'Next Map', value=f'{next_map_name} starts at {formatted_start}', inline=True)
 		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 		
@@ -47,9 +47,7 @@ class Commands(Cog):
 				pass
 		for name in memberList:
 			msg += f'{name}\n'
-		embed = Embed(title=f'Server Members List',
-					description=f'Shows the current members of the server',
-					colour=ctx.author.colour)
+		embed = Embed(title=f'Server Members List',	description=f'Shows the current members of the server', colour=ctx.author.colour)
 		embed.add_field(name=f'Member List', value=msg)
 		await ctx.message.delete()
 		await ctx.send(embed=embed ,delete_after= self.msg_delete_time)
@@ -63,8 +61,6 @@ class Commands(Cog):
 		else:
 			username = player
 		player_data = self.gg_tracker_api.getGames(username)
-		#check to see if player data is available
-		# if player_data.get('data') and player_data.get('data').get('items'):
 		msg = ""
 		for dates in player_data.get('data').get('items'):
 			datetime.fromisoformat
@@ -79,9 +75,6 @@ class Commands(Cog):
 		embed = Embed(title=player, description=msg)
 		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
-		# else:
-		# 	await ctx.message.delete()
-		# 	await ctx.send(f'No session data found for username {player}', delete_after= self.msg_delete_time)
 
 	@games.error
 	async def games_error(self, ctx, exc):
@@ -143,7 +136,6 @@ class Commands(Cog):
 						server_status = '\U00002705' if location[1]['Status'] == 'UP' else '\U0000274C'
 						time_stamp = u.localizeTimezoneStr(datetime.fromtimestamp(location[1]['QueryTimestamp'], timezone.utc), self.bot.tz, '%H:%M:%S')
 						embed.add_field(name=f'{server_type}:\n', value=f'{server_location}:\n{server_status}\nTimestamp:\n{time_stamp}', inline=True)
-		
 		await ctx.message.delete()
 		await ctx.send(embed=embed, delete_after= self.msg_delete_time)
 

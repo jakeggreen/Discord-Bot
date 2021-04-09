@@ -16,7 +16,6 @@ class Api(object):
 		resp.raise_for_status()
 		return resp
 
-
 class Mozam(Api):
 	def __init__(self):
 		name = 'Mozambique Here'
