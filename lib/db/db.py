@@ -47,7 +47,7 @@ def column(command, *values):
 
 	return [item[0] for item in cur.fetchall()]
 
-def execute(command, *value):
+def execute(command, *values):
 	cur.execute(command, tuple(values))
 
 def multiexec(command, valueset):

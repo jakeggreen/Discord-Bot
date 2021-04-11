@@ -8,6 +8,7 @@ from glob import glob
 from discord.ext.commands import CommandNotFound
 from datetime import datetime
 from settings import Bot_Settings
+from lib.db import db
 
 COGS = [path.split("\\")[-1][:-3] for path in glob("./cogs/*.py")]
 
@@ -76,6 +77,8 @@ class Bot(Bot, Bot_Settings):
 		now = datetime.now()
 		dt_string = now.strftime(self.date_f1)
 		print(f'{dt_string}: {ctx.author.display_name} successfully called command: {ctx.command}.')
+		db.execute("INSERT INTO tbl_commands_log VALUES(user = ?, command = ?, command_datetime = ?)", {ctx.author.display_name}, {ctx.command}, {dt_string})
+
 
 	async def on_command_error(self, ctx, exc):
 		now = datetime.now()
