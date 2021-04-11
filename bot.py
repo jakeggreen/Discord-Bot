@@ -30,6 +30,7 @@ class Bot(Bot, Bot_Settings):
 		self.cogs_ready = Ready()
 		self.guild = None
 		Bot_Settings.__init__(self)
+
 		super().__init__(
 			command_prefix = self.PREFIX,
 			intents=discord.Intents.all())
@@ -77,7 +78,10 @@ class Bot(Bot, Bot_Settings):
 		now = datetime.now()
 		dt_string = now.strftime(self.date_f1)
 		print(f'{dt_string}: {ctx.author.display_name} successfully called command: {ctx.command}.')
-		db.execute("INSERT INTO tbl_commands_log VALUES(user = ?, command = ?, command_datetime = ?)", {ctx.author.display_name}, {ctx.command}, {dt_string})
+		params = ()
+		db.execute("INSERT INTO tbl_commands_log VALUES (?, ?, ?)", str(ctx.author.display_name), str(ctx.command), dt_string)
+		db.commit()
+		db.close()
 
 	async def on_command_error(self, ctx, exc):
 		now = datetime.now()

@@ -2,8 +2,8 @@ from os.path import isfile
 from sqlite3 import connect
 import sqlite3
 
-DB_PATH = 'database.db'
-BUILD_PATH = 'build.sql'
+DB_PATH = './data/db/database.db'
+BUILD_PATH = './data/db/build.sql'
 
 con = connect(DB_PATH)
 cur = con.cursor()
@@ -56,5 +56,3 @@ def multiexec(command, valueset):
 def scriptexec(path):
 	with open(path, 'r', encoding='utf-8') as script:
 		cur.executescript(script.read())
-
-build()
