@@ -13,7 +13,6 @@ error_datetime datetime NULL,
 error_exception TEXT NULL
 );
 
-
 CREATE TABLE IF NOT EXISTS tbl_game_activity_log (
 activity_id INTEGER PRIMARY KEY AUTOINCREMENT,
 game_name TEXT NULL,

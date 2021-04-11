@@ -37,7 +37,6 @@ class Events(Cog):
 			db.execute("INSERT INTO tbl_game_activity_log (game_name, user, activity_start_time) VALUES (?, ?, ?)", str(after.display_name), str(after.activity.name), start)
 			db.commit()
 
-		
 		if before.activity != None and after.activity == None:
 			channel = before.guild.system_channel
 			embed = Embed(title=f'{after.display_name} has finished playing\n{before.activity.name}')
