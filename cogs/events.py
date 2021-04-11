@@ -6,6 +6,7 @@ import discord
 from datetime import datetime
 import time
 import lib.util as u
+from lib.db import db
 
 class Events(Cog):
 	def __init__(self, bot):
@@ -33,6 +34,9 @@ class Events(Cog):
 			# embed.add_field(name=f'Countdown:', value=u.countdown(7200), inline=True) -- currently just prints to terminal
 			embed.set_thumbnail(url='https://cdn.discordapp.com/emojis/687049202089721910.png?v=1')
 			await channel.send(embed=embed)
+			db.execute("INSERT INTO tbl_game_activity_log (game_name, user, activity_start_time) VALUES (?, ?, ?)", str(after.display_name), str(after.activity.name), start)
+			db.commit()
+
 		
 		if before.activity != None and after.activity == None:
 			channel = before.guild.system_channel

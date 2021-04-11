@@ -79,9 +79,8 @@ class Bot(Bot, Bot_Settings):
 		dt_string = now.strftime(self.date_f1)
 		print(f'{dt_string}: {ctx.author.display_name} successfully called command: {ctx.command}.')
 		params = ()
-		db.execute("INSERT INTO tbl_commands_log VALUES (?, ?, ?)", str(ctx.author.display_name), str(ctx.command), dt_string)
+		db.execute("INSERT INTO tbl_commands_log (user, command, command_datetime) VALUES (?, ?, ?)", str(ctx.author.display_name), str(ctx.command), dt_string)
 		db.commit()
-		db.close()
 
 	async def on_command_error(self, ctx, exc):
 		now = datetime.now()
