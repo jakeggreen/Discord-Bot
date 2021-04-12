@@ -19,6 +19,7 @@ def with_commit(func):
 def build():
 	if isfile(BUILD_PATH):
 		scriptexec(BUILD_PATH)
+		print('Database connected')
 
 def commit():
 	con.commit()
